@@ -1,0 +1,14 @@
+.venv/
+.env
+.cache/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+__pycache__/
+*.py[cod]
+
+data/
+*.duckdb
+*.duckdb.wal
+.vercel-api/
+artifacts/

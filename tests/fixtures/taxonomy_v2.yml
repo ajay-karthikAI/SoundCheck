@@ -1,0 +1,88 @@
+taxonomy_version: "2.0.0"
+default_genre_id: genre_rock
+other_genre_id: genre_other
+unresolved_genre_id: genre_unresolved
+
+macro_families:
+  - macro_family_id: macro_rock
+    display_name: Rock
+    slug: rock
+  - macro_family_id: macro_electronic
+    display_name: Electronic
+    slug: electronic
+  - macro_family_id: macro_unclassified
+    display_name: Unclassified
+    slug: unclassified
+
+genres:
+  - genre_id: genre_rock
+    display_name: Rock
+    slug: rock
+    macro_family_id: macro_rock
+    parent_genre_id: null
+    aliases: []
+    multilingual_aliases:
+      es: [Música rock]
+    lastfm_spelling_variants: [rock]
+    musicbrainz_spelling_variants: [rock]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_garage_rock
+    display_name: Garage Rock
+    slug: garage-rock
+    macro_family_id: macro_rock
+    parent_genre_id: genre_rock
+    aliases: [garage]
+    multilingual_aliases:
+      ja: [ガレージロック]
+    lastfm_spelling_variants: [garage rock]
+    musicbrainz_spelling_variants: [garage rock]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_uk_garage
+    display_name: UK Garage
+    slug: uk-garage
+    macro_family_id: macro_electronic
+    parent_genre_id: null
+    aliases: [garage, UKG]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [uk garage]
+    musicbrainz_spelling_variants: [uk garage]
+    status: candidate
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_other
+    display_name: Other
+    slug: other
+    macro_family_id: macro_unclassified
+    parent_genre_id: null
+    aliases: []
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [other]
+    musicbrainz_spelling_variants: [other]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_unresolved
+    display_name: Unresolved
+    slug: unresolved
+    macro_family_id: macro_unclassified
+    parent_genre_id: null
+    aliases: [unknown genre]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [unresolved]
+    musicbrainz_spelling_variants: [unresolved]
+    status: enabled
+    taxonomy_version: "2.0.0"
+
+production_compatibility:
+  canonical_genre_ids:
+    - genre_rock
+    - genre_garage_rock
+    - genre_other
+  lastfm_collection_tags:
+    - rock
+    - garage rock
+  musicbrainz_collection_tags:
+    - rock
+    - garage rock
+  manual_overrides:
+    garage: genre_garage_rock

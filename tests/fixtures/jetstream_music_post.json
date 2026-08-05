@@ -1,0 +1,32 @@
+{
+  "did": "did:plc:exampleartist",
+  "time_us": 1784552400000000,
+  "kind": "commit",
+  "commit": {
+    "rev": "3mexample",
+    "operation": "create",
+    "collection": "app.bsky.feed.post",
+    "rkey": "3lexample",
+    "record": {
+      "$type": "app.bsky.feed.post",
+      "text": "Our new EP just dropped! #NewRelease",
+      "createdAt": "2026-07-20T13:00:00-05:00",
+      "langs": ["en"],
+      "facets": [
+        {
+          "index": {
+            "byteStart": 0,
+            "byteEnd": 0
+          },
+          "features": [
+            {
+              "$type": "app.bsky.richtext.facet#link",
+              "uri": "https://open.spotify.com/album/example"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
+

@@ -1,0 +1,94 @@
+{
+  "candidates": [
+    {
+      "week_start": "2026-07-13",
+      "canonical_genre": "shoegaze",
+      "opportunity": 1.12,
+      "opportunity_ci_low": 0.71,
+      "opportunity_ci_high": 1.54,
+      "conversation_effective_n": 18.5,
+      "supply_effective_n": 7.0,
+      "supply_release_groups": 2,
+      "typical_releases": 5.0,
+      "release_range_low": 3,
+      "release_range_high": 8,
+      "release_history_weeks": 8,
+      "target_week": "2026-07-20",
+      "predicted_gain": 0.22,
+      "gain_interval_low": -0.41,
+      "gain_interval_high": 0.79,
+      "predicted_opportunity": 1.34,
+      "predicted_opportunity_interval_low": 0.62,
+      "predicted_opportunity_interval_high": 1.91,
+      "skill_status": "skill"
+    }
+  ],
+  "evidence_by_genre": {
+    "shoegaze": {
+      "artists": [
+        {
+          "artist_key": "mbid:aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+          "artist_name": "Glass Harbor",
+          "artist_mbid": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+          "playcount_delta": 1450,
+          "listeners_delta": 92,
+          "weighted_delta": 1910
+        },
+        {
+          "artist_key": "mbid:bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+          "artist_name": "Soft Static",
+          "artist_mbid": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+          "playcount_delta": 980,
+          "listeners_delta": 61,
+          "weighted_delta": 1285
+        },
+        {
+          "artist_key": "name:violet room",
+          "artist_name": "Violet Room",
+          "artist_mbid": null,
+          "playcount_delta": 610,
+          "listeners_delta": 38,
+          "weighted_delta": 800
+        }
+      ],
+      "conversation": {
+        "post_uri": "at://did:plc:fixture/app.bsky.feed.post/3fixture",
+        "did": "did:plc:fixture",
+        "text": "Glass Harbor has been on repeat all week; that blown-out guitar outro keeps opening up.",
+        "weighted_score": 17.5
+      },
+      "releases": [
+        {
+          "release_group_mbid": "cccccccc-cccc-cccc-cccc-cccccccccccc",
+          "title": "Afterimage"
+        }
+      ]
+    }
+  },
+  "scene_genres": [
+    {
+      "canonical_genre": "shoegaze",
+      "embedding": [1.0, 0.0, 0.0],
+      "supply_index": -0.4,
+      "supply_release_groups": 2
+    },
+    {
+      "canonical_genre": "dream pop",
+      "embedding": [0.96, 0.12, 0.0],
+      "supply_index": 1.3,
+      "supply_release_groups": 11
+    },
+    {
+      "canonical_genre": "slowcore",
+      "embedding": [0.91, 0.2, 0.0],
+      "supply_index": 0.7,
+      "supply_release_groups": 7
+    },
+    {
+      "canonical_genre": "jungle",
+      "embedding": [0.0, 0.0, 1.0],
+      "supply_index": 1.8,
+      "supply_release_groups": 13
+    }
+  ]
+}

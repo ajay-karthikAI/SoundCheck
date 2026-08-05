@@ -1,0 +1,31 @@
+SELECT
+    taxonomy_version,
+    week_start,
+    iso_year,
+    iso_week,
+    genre_id,
+    display_name,
+    slug,
+    macro_family_id,
+    macro_family_name,
+    taxonomy_status,
+    lastfm_tag_available,
+    unique_lastfm_artists,
+    artists_with_consecutive_valid_snapshots,
+    lastfm_history_weeks,
+    musicbrainz_release_group_count,
+    resolved_bluesky_post_count,
+    resolution_attempt_count,
+    resolution_rate,
+    cross_source_overlap_artist_count,
+    cross_source_overlap,
+    latest_source_timestamp,
+    listening_missing,
+    conversation_missing,
+    supply_missing,
+    stale,
+    eligibility_state,
+    computed_at
+FROM mart_.genre_coverage_v2
+WHERE taxonomy_version = ?
+ORDER BY week_start, macro_family_id, display_name, genre_id;

@@ -1,0 +1,21 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "fluid": true,
+  "functions": {
+    "api/index.py": {
+      "includeFiles": "{config/genre_canonical.yml,data/soundcheck.duckdb,soundcheck/sql/**}",
+      "maxDuration": 60
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/api/index"
+    }
+  ],
+  "env": {
+    "SOUNDCHECK_DB_PATH": "data/soundcheck.duckdb",
+    "SOUNDCHECK_TAXONOMY_PATH": "config/genre_canonical.yml",
+    "SOUNDCHECK_PROD_ORIGIN": "https://soundcheck-indie.ajayk19989.chatgpt.site"
+  }
+}

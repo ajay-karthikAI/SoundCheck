@@ -1,0 +1,65 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "soundcheck"
+version = "0.1.0"
+description = "Evidence-first indie music trend intelligence"
+requires-python = ">=3.12"
+dependencies = [
+  "atproto>=0.0.61,<1",
+  "duckdb>=1.1,<2",
+  "fastapi>=0.139,<1",
+  "httpx>=0.27,<1",
+  "lightgbm>=4.5,<5",
+  "numba>=0.66,<1",
+  "numpy>=1.26,<3",
+  "pydantic>=2.9,<3",
+  "pyyaml>=6.0,<7",
+  "pytz>=2024.2",
+  "rapidfuzz>=3.10,<4",
+  "scipy>=1.12,<2",
+  "sentence-transformers>=5.0,<6",
+  "statsmodels>=0.14,<1",
+  "umap-learn>=0.5.12,<1",
+  "uvicorn[standard]>=0.51,<1",
+  "websockets>=14,<16",
+]
+
+[dependency-groups]
+dev = [
+  "hypothesis>=6.100,<7",
+  "httpx2>=2.7,<3",
+  "mypy>=1.11,<2",
+  "pytest>=8.3,<9",
+  "pytest-asyncio>=0.24,<2",
+  "ruff>=0.8,<1",
+  "types-pyyaml>=6.0,<7",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["soundcheck"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"soundcheck/sql" = "soundcheck/sql"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "ASYNC", "DTZ", "RUF", "SIM"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["S101"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["soundcheck", "tests"]
+
+[tool.pytest.ini_options]
+addopts = "-ra"
+asyncio_mode = "strict"
+testpaths = ["tests"]

@@ -1,0 +1,1717 @@
+taxonomy_version: "2.0.0"
+default_genre_id: genre_indie_rock
+other_genre_id: genre_other
+unresolved_genre_id: genre_unresolved
+
+macro_families:
+  - macro_family_id: macro_african
+    display_name: African
+    slug: african
+  - macro_family_id: macro_asian_regional
+    display_name: Asian Regional
+    slug: asian-regional
+  - macro_family_id: macro_caribbean
+    display_name: Caribbean
+    slug: caribbean
+  - macro_family_id: macro_classical
+    display_name: Classical
+    slug: classical
+  - macro_family_id: macro_electronic
+    display_name: Electronic
+    slug: electronic
+  - macro_family_id: macro_experimental_ambient
+    display_name: Experimental and Ambient
+    slug: experimental-ambient
+  - macro_family_id: macro_folk_country
+    display_name: Folk and Country
+    slug: folk-country
+  - macro_family_id: macro_hip_hop
+    display_name: Hip-Hop
+    slug: hip-hop
+  - macro_family_id: macro_jazz
+    display_name: Jazz
+    slug: jazz
+  - macro_family_id: macro_latin
+    display_name: Latin
+    slug: latin
+  - macro_family_id: macro_metal
+    display_name: Metal
+    slug: metal
+  - macro_family_id: macro_pop
+    display_name: Pop
+    slug: pop
+  - macro_family_id: macro_punk
+    display_name: Punk
+    slug: punk
+  - macro_family_id: macro_rnb_soul
+    display_name: R&B and Soul
+    slug: r-and-b-soul
+  - macro_family_id: macro_rock
+    display_name: Rock
+    slug: rock
+  - macro_family_id: macro_unclassified
+    display_name: Unclassified
+    slug: unclassified
+
+genres:
+  # African
+  - genre_id: genre_african_music
+    display_name: African Music
+    slug: african-music
+    macro_family_id: macro_african
+    parent_genre_id: null
+    aliases: []
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [african music]
+    musicbrainz_spelling_variants: [african music]
+    status: candidate
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_afrobeat
+    display_name: Afrobeat
+    slug: afrobeat
+    macro_family_id: macro_african
+    parent_genre_id: genre_african_music
+    aliases: []
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [afrobeat]
+    musicbrainz_spelling_variants: [afrobeat]
+    status: candidate
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_afrobeats
+    display_name: Afrobeats
+    slug: afrobeats
+    macro_family_id: macro_african
+    parent_genre_id: genre_african_music
+    aliases: [afropop]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [afrobeats]
+    musicbrainz_spelling_variants: [afrobeats]
+    status: candidate
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_amapiano
+    display_name: Amapiano
+    slug: amapiano
+    macro_family_id: macro_african
+    parent_genre_id: genre_african_music
+    aliases: []
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [amapiano]
+    musicbrainz_spelling_variants: [amapiano]
+    status: candidate
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_ethio_jazz
+    display_name: Ethio-Jazz
+    slug: ethio-jazz
+    macro_family_id: macro_african
+    parent_genre_id: genre_african_music
+    aliases: [ethiopian jazz]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [ethio jazz]
+    musicbrainz_spelling_variants: [ethio-jazz]
+    status: candidate
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_highlife
+    display_name: Highlife
+    slug: highlife
+    macro_family_id: macro_african
+    parent_genre_id: genre_african_music
+    aliases: []
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [highlife]
+    musicbrainz_spelling_variants: [highlife]
+    status: candidate
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_mbalax
+    display_name: Mbalax
+    slug: mbalax
+    macro_family_id: macro_african
+    parent_genre_id: genre_african_music
+    aliases: []
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [mbalax]
+    musicbrainz_spelling_variants: [mbalax]
+    status: candidate
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_soukous
+    display_name: Soukous
+    slug: soukous
+    macro_family_id: macro_african
+    parent_genre_id: genre_african_music
+    aliases: [congolese rumba]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [soukous]
+    musicbrainz_spelling_variants: [soukous]
+    status: candidate
+    taxonomy_version: "2.0.0"
+
+  # Asian regional
+  - genre_id: genre_asian_regional
+    display_name: Asian Regional Music
+    slug: asian-regional-music
+    macro_family_id: macro_asian_regional
+    parent_genre_id: null
+    aliases: []
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [asian music]
+    musicbrainz_spelling_variants: [asian music]
+    status: candidate
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_cantopop
+    display_name: Cantopop
+    slug: cantopop
+    macro_family_id: macro_asian_regional
+    parent_genre_id: genre_asian_regional
+    aliases: [cantonese pop]
+    multilingual_aliases:
+      zh: [粵語流行音樂]
+    lastfm_spelling_variants: [cantopop]
+    musicbrainz_spelling_variants: [cantopop]
+    status: candidate
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_city_pop
+    display_name: City Pop
+    slug: city-pop
+    macro_family_id: macro_asian_regional
+    parent_genre_id: genre_asian_regional
+    aliases: [japanese city pop]
+    multilingual_aliases:
+      ja: [シティポップ]
+    lastfm_spelling_variants: [city pop]
+    musicbrainz_spelling_variants: [city pop]
+    status: candidate
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_enka
+    display_name: Enka
+    slug: enka
+    macro_family_id: macro_asian_regional
+    parent_genre_id: genre_asian_regional
+    aliases: []
+    multilingual_aliases:
+      ja: [演歌]
+    lastfm_spelling_variants: [enka]
+    musicbrainz_spelling_variants: [enka]
+    status: candidate
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_j_pop
+    display_name: J-Pop
+    slug: j-pop
+    macro_family_id: macro_asian_regional
+    parent_genre_id: genre_asian_regional
+    aliases: [japanese pop]
+    multilingual_aliases:
+      ja: [Jポップ]
+    lastfm_spelling_variants: [j-pop]
+    musicbrainz_spelling_variants: [j-pop]
+    status: candidate
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_k_pop
+    display_name: K-Pop
+    slug: k-pop
+    macro_family_id: macro_asian_regional
+    parent_genre_id: genre_asian_regional
+    aliases: [korean pop]
+    multilingual_aliases:
+      ko: [케이팝]
+    lastfm_spelling_variants: [k-pop]
+    musicbrainz_spelling_variants: [k-pop]
+    status: candidate
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_mandopop
+    display_name: Mandopop
+    slug: mandopop
+    macro_family_id: macro_asian_regional
+    parent_genre_id: genre_asian_regional
+    aliases: [mandarin pop]
+    multilingual_aliases:
+      zh: [華語流行音樂]
+    lastfm_spelling_variants: [mandopop]
+    musicbrainz_spelling_variants: [mandopop]
+    status: candidate
+    taxonomy_version: "2.0.0"
+
+  # Caribbean
+  - genre_id: genre_calypso
+    display_name: Calypso
+    slug: calypso
+    macro_family_id: macro_caribbean
+    parent_genre_id: genre_caribbean_music
+    aliases: []
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [calypso]
+    musicbrainz_spelling_variants: [calypso]
+    status: candidate
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_caribbean_music
+    display_name: Caribbean Music
+    slug: caribbean-music
+    macro_family_id: macro_caribbean
+    parent_genre_id: null
+    aliases: []
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [caribbean music]
+    musicbrainz_spelling_variants: [caribbean music]
+    status: candidate
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_dancehall
+    display_name: Dancehall
+    slug: dancehall
+    macro_family_id: macro_caribbean
+    parent_genre_id: genre_caribbean_music
+    aliases: []
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [dancehall]
+    musicbrainz_spelling_variants: [dancehall]
+    status: candidate
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_dub
+    display_name: Dub
+    slug: dub
+    macro_family_id: macro_caribbean
+    parent_genre_id: genre_reggae
+    aliases: []
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [dub]
+    musicbrainz_spelling_variants: [dub]
+    status: candidate
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_reggae
+    display_name: Reggae
+    slug: reggae
+    macro_family_id: macro_caribbean
+    parent_genre_id: genre_caribbean_music
+    aliases: []
+    multilingual_aliases:
+      ja: [レゲエ]
+    lastfm_spelling_variants: [reggae]
+    musicbrainz_spelling_variants: [reggae]
+    status: candidate
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_ska
+    display_name: Ska
+    slug: ska
+    macro_family_id: macro_caribbean
+    parent_genre_id: genre_caribbean_music
+    aliases: []
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [ska]
+    musicbrainz_spelling_variants: [ska]
+    status: candidate
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_soca
+    display_name: Soca
+    slug: soca
+    macro_family_id: macro_caribbean
+    parent_genre_id: genre_caribbean_music
+    aliases: []
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [soca]
+    musicbrainz_spelling_variants: [soca]
+    status: candidate
+    taxonomy_version: "2.0.0"
+
+  # Classical
+  - genre_id: genre_baroque
+    display_name: Baroque
+    slug: baroque
+    macro_family_id: macro_classical
+    parent_genre_id: genre_classical
+    aliases: [baroque classical]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [baroque]
+    musicbrainz_spelling_variants: [baroque]
+    status: candidate
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_classical
+    display_name: Classical
+    slug: classical
+    macro_family_id: macro_classical
+    parent_genre_id: null
+    aliases: [classical music]
+    multilingual_aliases:
+      es: [música clásica]
+      ja: [クラシック音楽]
+      zh: [古典音乐]
+    lastfm_spelling_variants: [classical]
+    musicbrainz_spelling_variants: [classical]
+    status: candidate
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_contemporary_classical
+    display_name: Contemporary Classical
+    slug: contemporary-classical
+    macro_family_id: macro_classical
+    parent_genre_id: genre_classical
+    aliases: [new classical]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [contemporary classical]
+    musicbrainz_spelling_variants: [contemporary classical]
+    status: candidate
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_minimalist_classical
+    display_name: Minimalist Classical
+    slug: minimalist-classical
+    macro_family_id: macro_classical
+    parent_genre_id: genre_classical
+    aliases: [minimalism]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [minimalist classical]
+    musicbrainz_spelling_variants: [minimalist classical]
+    status: candidate
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_opera
+    display_name: Opera
+    slug: opera
+    macro_family_id: macro_classical
+    parent_genre_id: genre_classical
+    aliases: []
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [opera]
+    musicbrainz_spelling_variants: [opera]
+    status: candidate
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_romantic_classical
+    display_name: Romantic Classical
+    slug: romantic-classical
+    macro_family_id: macro_classical
+    parent_genre_id: genre_classical
+    aliases: [romantic era]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [romantic classical]
+    musicbrainz_spelling_variants: [romantic]
+    status: candidate
+    taxonomy_version: "2.0.0"
+
+  # Electronic
+  - genre_id: genre_breakcore
+    display_name: Breakcore
+    slug: breakcore
+    macro_family_id: macro_electronic
+    parent_genre_id: genre_drum_and_bass
+    aliases: []
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [breakcore]
+    musicbrainz_spelling_variants: [breakcore]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_chillwave
+    display_name: Chillwave
+    slug: chillwave
+    macro_family_id: macro_electronic
+    parent_genre_id: genre_electronic
+    aliases: []
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [chillwave]
+    musicbrainz_spelling_variants: [chillwave]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_downtempo
+    display_name: Downtempo
+    slug: downtempo
+    macro_family_id: macro_electronic
+    parent_genre_id: genre_electronic
+    aliases: [downbeat]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [downtempo]
+    musicbrainz_spelling_variants: [downtempo]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_drum_and_bass
+    display_name: Drum and Bass
+    slug: drum-and-bass
+    macro_family_id: macro_electronic
+    parent_genre_id: genre_jungle
+    aliases: [d&b, dnb, drum & bass, drum n bass]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [dnb, drum and bass]
+    musicbrainz_spelling_variants: [dnb, drum and bass]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_dubstep
+    display_name: Dubstep
+    slug: dubstep
+    macro_family_id: macro_electronic
+    parent_genre_id: genre_electronic
+    aliases: []
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [dubstep]
+    musicbrainz_spelling_variants: [dubstep]
+    status: candidate
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_electronic
+    display_name: Electronic
+    slug: electronic
+    macro_family_id: macro_electronic
+    parent_genre_id: null
+    aliases: [electronica]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [electronic]
+    musicbrainz_spelling_variants: [electronic]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_footwork
+    display_name: Footwork
+    slug: footwork
+    macro_family_id: macro_electronic
+    parent_genre_id: genre_electronic
+    aliases: [chicago footwork]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [footwork]
+    musicbrainz_spelling_variants: [footwork]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_house
+    display_name: House
+    slug: house
+    macro_family_id: macro_electronic
+    parent_genre_id: genre_electronic
+    aliases: [house music]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [house]
+    musicbrainz_spelling_variants: [house]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_industrial
+    display_name: Industrial
+    slug: industrial
+    macro_family_id: macro_electronic
+    parent_genre_id: genre_electronic
+    aliases: [industrial music]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [industrial]
+    musicbrainz_spelling_variants: [industrial]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_jungle
+    display_name: Jungle
+    slug: jungle
+    macro_family_id: macro_electronic
+    parent_genre_id: genre_electronic
+    aliases: [jungle music]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [jungle]
+    musicbrainz_spelling_variants: [jungle]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_techno
+    display_name: Techno
+    slug: techno
+    macro_family_id: macro_electronic
+    parent_genre_id: genre_electronic
+    aliases: []
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [techno]
+    musicbrainz_spelling_variants: [techno]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_trance
+    display_name: Trance
+    slug: trance
+    macro_family_id: macro_electronic
+    parent_genre_id: genre_electronic
+    aliases: []
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [trance]
+    musicbrainz_spelling_variants: [trance]
+    status: candidate
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_trip_hop
+    display_name: Trip-Hop
+    slug: trip-hop
+    macro_family_id: macro_electronic
+    parent_genre_id: genre_downtempo
+    aliases: [trip hop]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [trip-hop]
+    musicbrainz_spelling_variants: [trip-hop]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_uk_garage
+    display_name: UK Garage
+    slug: uk-garage
+    macro_family_id: macro_electronic
+    parent_genre_id: genre_electronic
+    aliases: [garage, ukg]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [uk garage]
+    musicbrainz_spelling_variants: [uk garage]
+    status: enabled
+    taxonomy_version: "2.0.0"
+
+  # Experimental and ambient
+  - genre_id: genre_ambient
+    display_name: Ambient
+    slug: ambient
+    macro_family_id: macro_experimental_ambient
+    parent_genre_id: genre_experimental
+    aliases: [ambient music]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [ambient]
+    musicbrainz_spelling_variants: [ambient]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_dark_ambient
+    display_name: Dark Ambient
+    slug: dark-ambient
+    macro_family_id: macro_experimental_ambient
+    parent_genre_id: genre_ambient
+    aliases: []
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [dark ambient]
+    musicbrainz_spelling_variants: [dark ambient]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_drone
+    display_name: Drone
+    slug: drone
+    macro_family_id: macro_experimental_ambient
+    parent_genre_id: genre_experimental
+    aliases: [drone music]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [drone]
+    musicbrainz_spelling_variants: [drone]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_dungeon_synth
+    display_name: Dungeon Synth
+    slug: dungeon-synth
+    macro_family_id: macro_experimental_ambient
+    parent_genre_id: genre_ambient
+    aliases: []
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [dungeon synth]
+    musicbrainz_spelling_variants: [dungeon synth]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_experimental
+    display_name: Experimental
+    slug: experimental
+    macro_family_id: macro_experimental_ambient
+    parent_genre_id: null
+    aliases: [experimental music]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [experimental]
+    musicbrainz_spelling_variants: [experimental]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_glitch
+    display_name: Glitch
+    slug: glitch
+    macro_family_id: macro_experimental_ambient
+    parent_genre_id: genre_experimental
+    aliases: [glitch music]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [glitch]
+    musicbrainz_spelling_variants: [glitch]
+    status: candidate
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_lo_fi
+    display_name: Lo-Fi
+    slug: lo-fi
+    macro_family_id: macro_experimental_ambient
+    parent_genre_id: genre_experimental
+    aliases: [lo fi, lofi]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [lo-fi]
+    musicbrainz_spelling_variants: [lo-fi]
+    status: enabled
+    taxonomy_version: "2.0.0"
+
+  # Folk and country
+  - genre_id: genre_alt_country
+    display_name: Alt-Country
+    slug: alt-country
+    macro_family_id: macro_folk_country
+    parent_genre_id: genre_country
+    aliases: [alt country, alternative country]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [alt-country]
+    musicbrainz_spelling_variants: [alt-country]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_americana
+    display_name: Americana
+    slug: americana
+    macro_family_id: macro_folk_country
+    parent_genre_id: genre_folk_country
+    aliases: [roots music]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [americana]
+    musicbrainz_spelling_variants: [americana]
+    status: candidate
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_bluegrass
+    display_name: Bluegrass
+    slug: bluegrass
+    macro_family_id: macro_folk_country
+    parent_genre_id: genre_country
+    aliases: []
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [bluegrass]
+    musicbrainz_spelling_variants: [bluegrass]
+    status: candidate
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_country
+    display_name: Country
+    slug: country
+    macro_family_id: macro_folk_country
+    parent_genre_id: genre_folk_country
+    aliases: [country music]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [country]
+    musicbrainz_spelling_variants: [country]
+    status: candidate
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_folk
+    display_name: Folk
+    slug: folk
+    macro_family_id: macro_folk_country
+    parent_genre_id: genre_folk_country
+    aliases: [folk music]
+    multilingual_aliases:
+      es: [música folclórica]
+    lastfm_spelling_variants: [folk]
+    musicbrainz_spelling_variants: [folk]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_folk_country
+    display_name: Folk and Country
+    slug: folk-and-country
+    macro_family_id: macro_folk_country
+    parent_genre_id: null
+    aliases: []
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [folk and country]
+    musicbrainz_spelling_variants: [folk and country]
+    status: candidate
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_indie_folk
+    display_name: Indie Folk
+    slug: indie-folk
+    macro_family_id: macro_folk_country
+    parent_genre_id: genre_folk
+    aliases: []
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [indie folk]
+    musicbrainz_spelling_variants: [indie folk]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_singer_songwriter
+    display_name: Singer-Songwriter
+    slug: singer-songwriter
+    macro_family_id: macro_folk_country
+    parent_genre_id: genre_folk_country
+    aliases: [singer songwriter]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [singer-songwriter]
+    musicbrainz_spelling_variants: [singer-songwriter]
+    status: candidate
+    taxonomy_version: "2.0.0"
+
+  # Hip-hop
+  - genre_id: genre_boom_bap
+    display_name: Boom Bap
+    slug: boom-bap
+    macro_family_id: macro_hip_hop
+    parent_genre_id: genre_hip_hop
+    aliases: [boombap]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [boom bap]
+    musicbrainz_spelling_variants: [boom bap]
+    status: candidate
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_conscious_hip_hop
+    display_name: Conscious Hip Hop
+    slug: conscious-hip-hop
+    macro_family_id: macro_hip_hop
+    parent_genre_id: genre_hip_hop
+    aliases: [conscious rap]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [conscious hip hop]
+    musicbrainz_spelling_variants: [conscious hip hop]
+    status: candidate
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_drill
+    display_name: Drill
+    slug: drill
+    macro_family_id: macro_hip_hop
+    parent_genre_id: genre_hip_hop
+    aliases: [drill music]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [drill]
+    musicbrainz_spelling_variants: [drill]
+    status: candidate
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_experimental_hip_hop
+    display_name: Experimental Hip Hop
+    slug: experimental-hip-hop
+    macro_family_id: macro_hip_hop
+    parent_genre_id: genre_hip_hop
+    aliases: [experimental hip-hop]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [experimental hip hop]
+    musicbrainz_spelling_variants: [experimental hip hop]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_grime
+    display_name: Grime
+    slug: grime
+    macro_family_id: macro_hip_hop
+    parent_genre_id: genre_hip_hop
+    aliases: [grime music]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [grime]
+    musicbrainz_spelling_variants: [grime]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_hip_hop
+    display_name: Hip Hop
+    slug: hip-hop
+    macro_family_id: macro_hip_hop
+    parent_genre_id: null
+    aliases: [hip-hop, rap]
+    multilingual_aliases:
+      ja: [ヒップホップ]
+      ko: [힙합]
+    lastfm_spelling_variants: [hip hop]
+    musicbrainz_spelling_variants: [hip hop]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_trap
+    display_name: Trap
+    slug: trap
+    macro_family_id: macro_hip_hop
+    parent_genre_id: genre_hip_hop
+    aliases: [trap music]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [trap]
+    musicbrainz_spelling_variants: [trap]
+    status: candidate
+    taxonomy_version: "2.0.0"
+
+  # Jazz
+  - genre_id: genre_bebop
+    display_name: Bebop
+    slug: bebop
+    macro_family_id: macro_jazz
+    parent_genre_id: genre_jazz
+    aliases: [bop]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [bebop]
+    musicbrainz_spelling_variants: [bebop]
+    status: candidate
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_free_jazz
+    display_name: Free Jazz
+    slug: free-jazz
+    macro_family_id: macro_jazz
+    parent_genre_id: genre_jazz
+    aliases: []
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [free jazz]
+    musicbrainz_spelling_variants: [free jazz]
+    status: candidate
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_jazz
+    display_name: Jazz
+    slug: jazz
+    macro_family_id: macro_jazz
+    parent_genre_id: null
+    aliases: [jazz music]
+    multilingual_aliases:
+      ja: [ジャズ]
+    lastfm_spelling_variants: [jazz]
+    musicbrainz_spelling_variants: [jazz]
+    status: candidate
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_jazz_fusion
+    display_name: Jazz Fusion
+    slug: jazz-fusion
+    macro_family_id: macro_jazz
+    parent_genre_id: genre_jazz
+    aliases: [fusion jazz]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [jazz fusion]
+    musicbrainz_spelling_variants: [jazz fusion]
+    status: candidate
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_smooth_jazz
+    display_name: Smooth Jazz
+    slug: smooth-jazz
+    macro_family_id: macro_jazz
+    parent_genre_id: genre_jazz
+    aliases: []
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [smooth jazz]
+    musicbrainz_spelling_variants: [smooth jazz]
+    status: candidate
+    taxonomy_version: "2.0.0"
+
+  # Latin
+  - genre_id: genre_bachata
+    display_name: Bachata
+    slug: bachata
+    macro_family_id: macro_latin
+    parent_genre_id: genre_latin_music
+    aliases: []
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [bachata]
+    musicbrainz_spelling_variants: [bachata]
+    status: candidate
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_bossa_nova
+    display_name: Bossa Nova
+    slug: bossa-nova
+    macro_family_id: macro_latin
+    parent_genre_id: genre_latin_music
+    aliases: []
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [bossa nova]
+    musicbrainz_spelling_variants: [bossa nova]
+    status: candidate
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_cumbia
+    display_name: Cumbia
+    slug: cumbia
+    macro_family_id: macro_latin
+    parent_genre_id: genre_latin_music
+    aliases: []
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [cumbia]
+    musicbrainz_spelling_variants: [cumbia]
+    status: candidate
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_latin_music
+    display_name: Latin Music
+    slug: latin-music
+    macro_family_id: macro_latin
+    parent_genre_id: null
+    aliases: [música latina]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [latin]
+    musicbrainz_spelling_variants: [latin]
+    status: candidate
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_latin_pop
+    display_name: Latin Pop
+    slug: latin-pop
+    macro_family_id: macro_latin
+    parent_genre_id: genre_latin_music
+    aliases: [pop latino]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [latin pop]
+    musicbrainz_spelling_variants: [latin pop]
+    status: candidate
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_reggaeton
+    display_name: Reggaeton
+    slug: reggaeton
+    macro_family_id: macro_latin
+    parent_genre_id: genre_latin_music
+    aliases: [reguetón]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [reggaeton]
+    musicbrainz_spelling_variants: [reggaeton]
+    status: candidate
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_regional_mexican
+    display_name: Regional Mexican
+    slug: regional-mexican
+    macro_family_id: macro_latin
+    parent_genre_id: genre_latin_music
+    aliases: [música regional mexicana]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [regional mexican]
+    musicbrainz_spelling_variants: [regional mexican]
+    status: candidate
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_salsa
+    display_name: Salsa
+    slug: salsa
+    macro_family_id: macro_latin
+    parent_genre_id: genre_latin_music
+    aliases: [salsa music]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [salsa]
+    musicbrainz_spelling_variants: [salsa]
+    status: candidate
+    taxonomy_version: "2.0.0"
+
+  # Metal
+  - genre_id: genre_black_metal
+    display_name: Black Metal
+    slug: black-metal
+    macro_family_id: macro_metal
+    parent_genre_id: genre_metal
+    aliases: [atmospheric black metal, blackgaze]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [black metal]
+    musicbrainz_spelling_variants: [black metal]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_death_metal
+    display_name: Death Metal
+    slug: death-metal
+    macro_family_id: macro_metal
+    parent_genre_id: genre_metal
+    aliases: []
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [death metal]
+    musicbrainz_spelling_variants: [death metal]
+    status: candidate
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_doom_metal
+    display_name: Doom Metal
+    slug: doom-metal
+    macro_family_id: macro_metal
+    parent_genre_id: genre_metal
+    aliases: []
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [doom metal]
+    musicbrainz_spelling_variants: [doom metal]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_heavy_metal
+    display_name: Heavy Metal
+    slug: heavy-metal
+    macro_family_id: macro_metal
+    parent_genre_id: genre_metal
+    aliases: []
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [heavy metal]
+    musicbrainz_spelling_variants: [heavy metal]
+    status: candidate
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_metal
+    display_name: Metal
+    slug: metal
+    macro_family_id: macro_metal
+    parent_genre_id: null
+    aliases: [metal music]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [metal]
+    musicbrainz_spelling_variants: [metal]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_power_metal
+    display_name: Power Metal
+    slug: power-metal
+    macro_family_id: macro_metal
+    parent_genre_id: genre_metal
+    aliases: []
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [power metal]
+    musicbrainz_spelling_variants: [power metal]
+    status: candidate
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_sludge_metal
+    display_name: Sludge Metal
+    slug: sludge-metal
+    macro_family_id: macro_metal
+    parent_genre_id: genre_metal
+    aliases: [sludge]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [sludge metal]
+    musicbrainz_spelling_variants: [sludge metal]
+    status: candidate
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_thrash_metal
+    display_name: Thrash Metal
+    slug: thrash-metal
+    macro_family_id: macro_metal
+    parent_genre_id: genre_metal
+    aliases: []
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [thrash metal]
+    musicbrainz_spelling_variants: [thrash metal]
+    status: candidate
+    taxonomy_version: "2.0.0"
+
+  # Pop
+  - genre_id: genre_bedroom_pop
+    display_name: Bedroom Pop
+    slug: bedroom-pop
+    macro_family_id: macro_pop
+    parent_genre_id: genre_indie_pop
+    aliases: []
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [bedroom pop]
+    musicbrainz_spelling_variants: [bedroom pop]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_electropop
+    display_name: Electropop
+    slug: electropop
+    macro_family_id: macro_pop
+    parent_genre_id: genre_pop
+    aliases: [electro pop]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [electropop]
+    musicbrainz_spelling_variants: [electropop]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_glitch_pop
+    display_name: Glitch Pop
+    slug: glitch-pop
+    macro_family_id: macro_pop
+    parent_genre_id: genre_pop
+    aliases: []
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [glitch pop]
+    musicbrainz_spelling_variants: [glitch pop]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_hyperpop
+    display_name: Hyperpop
+    slug: hyperpop
+    macro_family_id: macro_pop
+    parent_genre_id: genre_pop
+    aliases: []
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [hyperpop]
+    musicbrainz_spelling_variants: [hyperpop]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_indie_pop
+    display_name: Indie Pop
+    slug: indie-pop
+    macro_family_id: macro_pop
+    parent_genre_id: genre_pop
+    aliases: []
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [indie pop]
+    musicbrainz_spelling_variants: [indie pop]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_pop
+    display_name: Pop
+    slug: pop
+    macro_family_id: macro_pop
+    parent_genre_id: null
+    aliases: [pop music]
+    multilingual_aliases:
+      ja: [ポップ]
+      ko: [팝]
+    lastfm_spelling_variants: [pop]
+    musicbrainz_spelling_variants: [pop]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_synthpop
+    display_name: Synthpop
+    slug: synthpop
+    macro_family_id: macro_pop
+    parent_genre_id: genre_pop
+    aliases: [synth pop, synth-pop]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [synthpop]
+    musicbrainz_spelling_variants: [synthpop]
+    status: enabled
+    taxonomy_version: "2.0.0"
+
+  # Punk
+  - genre_id: genre_emo
+    display_name: Emo
+    slug: emo
+    macro_family_id: macro_punk
+    parent_genre_id: genre_punk_rock
+    aliases: []
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [emo]
+    musicbrainz_spelling_variants: [emo]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_folk_punk
+    display_name: Folk Punk
+    slug: folk-punk
+    macro_family_id: macro_punk
+    parent_genre_id: genre_punk_rock
+    aliases: []
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [folk punk]
+    musicbrainz_spelling_variants: [folk punk]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_hardcore_punk
+    display_name: Hardcore Punk
+    slug: hardcore-punk
+    macro_family_id: macro_punk
+    parent_genre_id: genre_punk_rock
+    aliases: [hardcore]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [hardcore punk]
+    musicbrainz_spelling_variants: [hardcore punk]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_midwest_emo
+    display_name: Midwest Emo
+    slug: midwest-emo
+    macro_family_id: macro_punk
+    parent_genre_id: genre_emo
+    aliases: [midwestern emo]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [midwest emo]
+    musicbrainz_spelling_variants: [midwest emo]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_post_punk
+    display_name: Post-Punk
+    slug: post-punk
+    macro_family_id: macro_punk
+    parent_genre_id: genre_punk_rock
+    aliases: [post punk]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [post-punk]
+    musicbrainz_spelling_variants: [post-punk]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_punk_rock
+    display_name: Punk Rock
+    slug: punk-rock
+    macro_family_id: macro_punk
+    parent_genre_id: null
+    aliases: [punk]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [punk rock]
+    musicbrainz_spelling_variants: [punk rock]
+    status: enabled
+    taxonomy_version: "2.0.0"
+
+  # R&B and soul
+  - genre_id: genre_funk
+    display_name: Funk
+    slug: funk
+    macro_family_id: macro_rnb_soul
+    parent_genre_id: genre_r_and_b
+    aliases: [funk music]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [funk]
+    musicbrainz_spelling_variants: [funk]
+    status: candidate
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_gospel
+    display_name: Gospel
+    slug: gospel
+    macro_family_id: macro_rnb_soul
+    parent_genre_id: genre_soul
+    aliases: [gospel music]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [gospel]
+    musicbrainz_spelling_variants: [gospel]
+    status: candidate
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_neo_soul
+    display_name: Neo-Soul
+    slug: neo-soul
+    macro_family_id: macro_rnb_soul
+    parent_genre_id: genre_soul
+    aliases: [neo soul]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [neo-soul]
+    musicbrainz_spelling_variants: [neo-soul]
+    status: candidate
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_r_and_b
+    display_name: R&B
+    slug: r-and-b
+    macro_family_id: macro_rnb_soul
+    parent_genre_id: null
+    aliases: [rnb, rhythm and blues]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [r&b]
+    musicbrainz_spelling_variants: [r&b]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_soul
+    display_name: Soul
+    slug: soul
+    macro_family_id: macro_rnb_soul
+    parent_genre_id: genre_r_and_b
+    aliases: [soul music]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [soul]
+    musicbrainz_spelling_variants: [soul]
+    status: candidate
+    taxonomy_version: "2.0.0"
+
+  # Rock
+  - genre_id: genre_alternative_rock
+    display_name: Alternative Rock
+    slug: alternative-rock
+    macro_family_id: macro_rock
+    parent_genre_id: genre_rock
+    aliases: [alt rock]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [alternative rock]
+    musicbrainz_spelling_variants: [alternative rock]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_art_rock
+    display_name: Art Rock
+    slug: art-rock
+    macro_family_id: macro_rock
+    parent_genre_id: genre_rock
+    aliases: []
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [art rock]
+    musicbrainz_spelling_variants: [art rock]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_coldwave
+    display_name: Coldwave
+    slug: coldwave
+    macro_family_id: macro_rock
+    parent_genre_id: genre_new_wave
+    aliases: [cold wave]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [coldwave]
+    musicbrainz_spelling_variants: [coldwave]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_darkwave
+    display_name: Darkwave
+    slug: darkwave
+    macro_family_id: macro_rock
+    parent_genre_id: genre_new_wave
+    aliases: [dark wave]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [darkwave]
+    musicbrainz_spelling_variants: [darkwave]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_dream_pop
+    display_name: Dream Pop
+    slug: dream-pop
+    macro_family_id: macro_rock
+    parent_genre_id: genre_indie_rock
+    aliases: [dreampop]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [dream pop]
+    musicbrainz_spelling_variants: [dream pop]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_garage_rock
+    display_name: Garage Rock
+    slug: garage-rock
+    macro_family_id: macro_rock
+    parent_genre_id: genre_rock
+    aliases: []
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [garage rock]
+    musicbrainz_spelling_variants: [garage rock]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_gothic_rock
+    display_name: Gothic Rock
+    slug: gothic-rock
+    macro_family_id: macro_rock
+    parent_genre_id: genre_rock
+    aliases: [goth rock]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [gothic rock]
+    musicbrainz_spelling_variants: [gothic rock]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_indie_rock
+    display_name: Indie Rock
+    slug: indie-rock
+    macro_family_id: macro_rock
+    parent_genre_id: genre_rock
+    aliases: [independent rock]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [indie rock]
+    musicbrainz_spelling_variants: [indie rock]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_krautrock
+    display_name: Krautrock
+    slug: krautrock
+    macro_family_id: macro_rock
+    parent_genre_id: genre_rock
+    aliases: [kosmische musik]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [krautrock]
+    musicbrainz_spelling_variants: [krautrock]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_math_rock
+    display_name: Math Rock
+    slug: math-rock
+    macro_family_id: macro_rock
+    parent_genre_id: genre_rock
+    aliases: []
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [math rock]
+    musicbrainz_spelling_variants: [math rock]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_new_wave
+    display_name: New Wave
+    slug: new-wave
+    macro_family_id: macro_rock
+    parent_genre_id: genre_rock
+    aliases: []
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [new wave]
+    musicbrainz_spelling_variants: [new wave]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_noise_rock
+    display_name: Noise Rock
+    slug: noise-rock
+    macro_family_id: macro_rock
+    parent_genre_id: genre_rock
+    aliases: []
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [noise rock]
+    musicbrainz_spelling_variants: [noise rock]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_post_rock
+    display_name: Post-Rock
+    slug: post-rock
+    macro_family_id: macro_rock
+    parent_genre_id: genre_rock
+    aliases: [post rock]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [post-rock]
+    musicbrainz_spelling_variants: [post-rock]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_psychedelic_rock
+    display_name: Psychedelic Rock
+    slug: psychedelic-rock
+    macro_family_id: macro_rock
+    parent_genre_id: genre_rock
+    aliases: [psych rock]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [psychedelic rock]
+    musicbrainz_spelling_variants: [psychedelic rock]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_rock
+    display_name: Rock
+    slug: rock
+    macro_family_id: macro_rock
+    parent_genre_id: null
+    aliases: [rock music]
+    multilingual_aliases:
+      ja: [ロック]
+    lastfm_spelling_variants: [rock]
+    musicbrainz_spelling_variants: [rock]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_sadcore
+    display_name: Sadcore
+    slug: sadcore
+    macro_family_id: macro_rock
+    parent_genre_id: genre_slowcore
+    aliases: []
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [sadcore]
+    musicbrainz_spelling_variants: [sadcore]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_shoegaze
+    display_name: Shoegaze
+    slug: shoegaze
+    macro_family_id: macro_rock
+    parent_genre_id: genre_indie_rock
+    aliases: [nu gaze, nu-gaze, shoegazing]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [shoegaze]
+    musicbrainz_spelling_variants: [shoegaze]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_slowcore
+    display_name: Slowcore
+    slug: slowcore
+    macro_family_id: macro_rock
+    parent_genre_id: genre_indie_rock
+    aliases: [slow core]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [slowcore]
+    musicbrainz_spelling_variants: [slowcore]
+    status: enabled
+    taxonomy_version: "2.0.0"
+
+  # Unclassified and explicit non-matches
+  - genre_id: genre_miscellaneous
+    display_name: Miscellaneous
+    slug: miscellaneous
+    macro_family_id: macro_unclassified
+    parent_genre_id: null
+    aliases: [misc]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [miscellaneous]
+    musicbrainz_spelling_variants: [miscellaneous]
+    status: rejected
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_other
+    display_name: Other
+    slug: other
+    macro_family_id: macro_unclassified
+    parent_genre_id: null
+    aliases: [other genre]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [other]
+    musicbrainz_spelling_variants: [other]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_unresolved
+    display_name: Unresolved
+    slug: unresolved
+    macro_family_id: macro_unclassified
+    parent_genre_id: null
+    aliases: [unknown genre]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [unresolved]
+    musicbrainz_spelling_variants: [unresolved]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_urban
+    display_name: Urban
+    slug: urban
+    macro_family_id: macro_unclassified
+    parent_genre_id: null
+    aliases: [urban music]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [urban]
+    musicbrainz_spelling_variants: [urban]
+    status: rejected
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_world_music
+    display_name: World Music
+    slug: world-music
+    macro_family_id: macro_unclassified
+    parent_genre_id: null
+    aliases: [world]
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [world music]
+    musicbrainz_spelling_variants: [world music]
+    status: rejected
+    taxonomy_version: "2.0.0"
+
+  # Additional existing electronic/pop scenes
+  - genre_id: genre_synthwave
+    display_name: Synthwave
+    slug: synthwave
+    macro_family_id: macro_electronic
+    parent_genre_id: genre_electronic
+    aliases: []
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [synthwave]
+    musicbrainz_spelling_variants: [synthwave]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_vaporwave
+    display_name: Vaporwave
+    slug: vaporwave
+    macro_family_id: macro_electronic
+    parent_genre_id: genre_electronic
+    aliases: []
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [vaporwave]
+    musicbrainz_spelling_variants: [vaporwave]
+    status: enabled
+    taxonomy_version: "2.0.0"
+  - genre_id: genre_witch_house
+    display_name: Witch House
+    slug: witch-house
+    macro_family_id: macro_electronic
+    parent_genre_id: genre_electronic
+    aliases: []
+    multilingual_aliases: {}
+    lastfm_spelling_variants: [witch house]
+    musicbrainz_spelling_variants: [witch house]
+    status: enabled
+    taxonomy_version: "2.0.0"
+
+production_compatibility:
+  # This list intentionally reproduces the pre-v2 metric/embedding universe.
+  canonical_genre_ids:
+    - genre_indie_rock
+    - genre_alternative_rock
+    - genre_indie_pop
+    - genre_pop
+    - genre_rock
+    - genre_shoegaze
+    - genre_dream_pop
+    - genre_post_punk
+    - genre_new_wave
+    - genre_darkwave
+    - genre_coldwave
+    - genre_gothic_rock
+    - genre_bedroom_pop
+    - genre_lo_fi
+    - genre_slowcore
+    - genre_sadcore
+    - genre_midwest_emo
+    - genre_emo
+    - genre_math_rock
+    - genre_post_rock
+    - genre_noise_rock
+    - genre_art_rock
+    - genre_psychedelic_rock
+    - genre_garage_rock
+    - genre_krautrock
+    - genre_punk_rock
+    - genre_hardcore_punk
+    - genre_experimental
+    - genre_ambient
+    - genre_drone
+    - genre_dark_ambient
+    - genre_dungeon_synth
+    - genre_vaporwave
+    - genre_synthwave
+    - genre_synthpop
+    - genre_chillwave
+    - genre_hyperpop
+    - genre_electropop
+    - genre_glitch_pop
+    - genre_witch_house
+    - genre_industrial
+    - genre_electronic
+    - genre_techno
+    - genre_house
+    - genre_uk_garage
+    - genre_jungle
+    - genre_drum_and_bass
+    - genre_breakcore
+    - genre_footwork
+    - genre_trip_hop
+    - genre_downtempo
+    - genre_grime
+    - genre_hip_hop
+    - genre_experimental_hip_hop
+    - genre_r_and_b
+    - genre_folk
+    - genre_indie_folk
+    - genre_folk_punk
+    - genre_alt_country
+    - genre_metal
+    - genre_black_metal
+    - genre_doom_metal
+    - genre_other
+
+  # These lists intentionally reproduce the pre-v2 collector view in Phase B.
+  lastfm_collection_tags:
+    - indie rock
+    - alternative rock
+    - indie pop
+    - shoegaze
+    - dream pop
+    - post-punk
+    - new wave
+    - darkwave
+    - coldwave
+    - gothic rock
+    - bedroom pop
+    - lo-fi
+    - slowcore
+    - sadcore
+    - midwest emo
+    - emo
+    - math rock
+    - post-rock
+    - noise rock
+    - art rock
+    - psychedelic rock
+    - garage rock
+    - krautrock
+    - experimental
+    - ambient
+    - drone
+    - dark ambient
+    - dungeon synth
+    - vaporwave
+    - synthwave
+    - chillwave
+    - hyperpop
+    - electropop
+    - glitch pop
+    - witch house
+    - industrial
+    - techno
+    - house
+    - jungle
+    - drum and bass
+    - dnb
+    - breakcore
+    - footwork
+    - trip-hop
+    - downtempo
+    - folk punk
+    - indie folk
+    - alt-country
+
+  musicbrainz_collection_tags:
+    - indie rock
+    - alternative rock
+    - indie pop
+    - shoegaze
+    - dream pop
+    - post-punk
+    - new wave
+    - darkwave
+    - coldwave
+    - gothic rock
+    - bedroom pop
+    - lo-fi
+    - slowcore
+    - sadcore
+    - midwest emo
+    - emo
+    - math rock
+    - post-rock
+    - noise rock
+    - art rock
+    - psychedelic rock
+    - garage rock
+    - krautrock
+    - experimental
+    - ambient
+    - drone
+    - dark ambient
+    - dungeon synth
+    - vaporwave
+    - synthwave
+    - chillwave
+    - hyperpop
+    - electropop
+    - glitch pop
+    - witch house
+    - industrial
+    - techno
+    - house
+    - jungle
+    - drum and bass
+    - dnb
+    - breakcore
+    - footwork
+    - trip-hop
+    - downtempo
+    - folk punk
+    - indie folk
+    - alt-country
+
+  manual_overrides:
+    dnb: genre_drum_and_bass
+    "d&b": genre_drum_and_bass
+    drum n bass: genre_drum_and_bass
+    "drum & bass": genre_drum_and_bass
+    trip hop: genre_trip_hop
+    post punk: genre_post_punk
+    synth pop: genre_synthpop
+    synth-pop: genre_synthpop
+    lofi: genre_lo_fi
+    lo fi: genre_lo_fi
+    alt country: genre_alt_country
+    alternative country: genre_alt_country
+    nu gaze: genre_shoegaze
+    nu-gaze: genre_shoegaze
+    hip-hop: genre_hip_hop
+    experimental hip-hop: genre_experimental_hip_hop
+    rnb: genre_r_and_b
+    rhythm and blues: genre_r_and_b
+    ukg: genre_uk_garage
+    garage: genre_uk_garage
+    atmospheric black metal: genre_black_metal
+    blackgaze: genre_black_metal

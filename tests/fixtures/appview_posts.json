@@ -1,0 +1,19 @@
+{
+  "posts": [
+    {
+      "uri": "at://did:plc:one/app.bsky.feed.post/one",
+      "cid": "bafyone",
+      "likeCount": 12,
+      "repostCount": 3,
+      "replyCount": 2
+    },
+    {
+      "uri": "at://did:plc:two/app.bsky.feed.post/two",
+      "cid": "bafytwo",
+      "likeCount": 4,
+      "repostCount": 1,
+      "replyCount": 0
+    }
+  ]
+}
+

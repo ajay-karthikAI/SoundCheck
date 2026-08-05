@@ -1,0 +1,225 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  --canvas: #0a0a0b;
+  --surface: #101012;
+  --raised: #151518;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.14);
+  --text: #f2f2f3;
+  --muted: #929299;
+  --faint: #5f5f66;
+  --accent: #6872f3;
+  --positive: #87a48e;
+  --negative: #b98585;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--canvas);
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background: var(--canvas);
+  color: var(--text);
+  font-family: var(--font-geist-sans), Inter, sans-serif;
+  font-feature-settings: "ss01", "ss03";
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: rgba(104, 114, 243, 0.28);
+  color: white;
+}
+
+a,
+button,
+input,
+select {
+  transition-duration: 150ms;
+  transition-timing-function: ease;
+}
+
+button,
+select {
+  font: inherit;
+}
+
+.numeral {
+  font-family: var(--font-geist-mono), "JetBrains Mono", monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.hairline {
+  border-color: var(--border);
+}
+
+.focus-ring:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.chart-grid line {
+  stroke: rgba(255, 255, 255, 0.06);
+}
+
+.recharts-cartesian-axis-tick-value,
+.recharts-polar-angle-axis-tick-value {
+  fill: #73737b;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.recharts-tooltip-cursor {
+  stroke: rgba(255, 255, 255, 0.12);
+}
+
+.chart-dot {
+  filter: drop-shadow(0 0 3px rgba(104, 114, 243, 0.12));
+  transform-box: fill-box;
+  transform-origin: center;
+  transition:
+    opacity 150ms ease,
+    filter 150ms ease,
+    transform 150ms ease;
+}
+
+.chart-dot:hover {
+  filter: drop-shadow(0 0 5px rgba(135, 144, 255, 0.28));
+  opacity: 1;
+  transform: scale(1.18);
+}
+
+.method-copy {
+  max-width: 78ch;
+  color: rgba(255, 255, 255, 0.56);
+  font-size: 0.875rem;
+  line-height: 1.75;
+}
+
+.method-copy h1,
+.method-copy h2,
+.method-copy h3 {
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  scroll-margin-top: 6rem;
+}
+
+.method-copy h1 {
+  margin: 0 0 2rem;
+  font-size: 1.75rem;
+}
+
+.method-copy h2 {
+  margin: 3rem 0 1rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+  font-size: 1.25rem;
+}
+
+.method-copy h3 {
+  margin: 2rem 0 0.75rem;
+  font-size: 1rem;
+}
+
+.method-copy p,
+.method-copy ul,
+.method-copy ol,
+.method-copy pre,
+.method-copy table,
+.method-copy blockquote {
+  margin: 1rem 0;
+}
+
+.method-copy ul,
+.method-copy ol {
+  padding-left: 1.25rem;
+}
+
+.method-copy ul {
+  list-style: disc;
+}
+
+.method-copy ol {
+  list-style: decimal;
+}
+
+.method-copy li + li {
+  margin-top: 0.35rem;
+}
+
+.method-copy a {
+  color: #aeb4ff;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.method-copy code {
+  border: 1px solid var(--border);
+  border-radius: 0.2rem;
+  background: rgba(255, 255, 255, 0.035);
+  padding: 0.1rem 0.3rem;
+  color: rgba(255, 255, 255, 0.72);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.82em;
+}
+
+.method-copy pre {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 0.35rem;
+  background: #0d0d0f;
+  padding: 1rem;
+}
+
+.method-copy pre code {
+  border: 0;
+  background: transparent;
+  padding: 0;
+}
+
+.method-copy table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.method-copy th,
+.method-copy td {
+  border-bottom: 1px solid var(--border);
+  padding: 0.65rem 0.75rem;
+  text-align: left;
+}
+
+.method-copy th {
+  color: rgba(255, 255, 255, 0.76);
+  font-weight: 500;
+}
+
+.method-copy blockquote {
+  border-left: 2px solid var(--accent);
+  padding-left: 1rem;
+  color: rgba(255, 255, 255, 0.42);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

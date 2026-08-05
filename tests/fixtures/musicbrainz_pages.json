@@ -1,0 +1,89 @@
+{
+  "0": {
+    "created": "2026-07-23T12:00:00Z",
+    "count": 2,
+    "offset": 0,
+    "release-groups": [
+      {
+        "id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+        "title": "First Supply Record",
+        "first-release-date": "2026-07-20",
+        "primary-type": "Album",
+        "secondary-types": [],
+        "artist-credit": [
+          {
+            "name": "Supply Artist",
+            "joinphrase": "",
+            "artist": {
+              "id": "cccccccc-cccc-cccc-cccc-cccccccccccc",
+              "name": "Supply Artist"
+            }
+          }
+        ],
+        "genres": [
+          {
+            "name": "shoegaze",
+            "count": 4
+          }
+        ],
+        "tags": [
+          {
+            "name": "shoegaze",
+            "count": 8
+          },
+          {
+            "name": "dream pop",
+            "count": 3
+          }
+        ]
+      }
+    ]
+  },
+  "1": {
+    "created": "2026-07-23T12:00:01Z",
+    "count": 2,
+    "offset": 1,
+    "release-groups": [
+      {
+        "id": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+        "title": "Second Supply Record",
+        "first-release-date": "2026-07-21",
+        "primary-type": "EP",
+        "secondary-types": [
+          "Mixtape/Street"
+        ],
+        "artist-credit": [
+          {
+            "name": "Artist One",
+            "joinphrase": " & ",
+            "artist": {
+              "id": "dddddddd-dddd-dddd-dddd-dddddddddddd",
+              "name": "Artist One"
+            }
+          },
+          {
+            "name": "Artist Two",
+            "joinphrase": "",
+            "artist": {
+              "id": "eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee",
+              "name": "Artist Two"
+            }
+          }
+        ],
+        "genres": [
+          {
+            "name": "jungle",
+            "count": 2
+          }
+        ],
+        "tags": [
+          {
+            "name": "dnb",
+            "count": 5
+          }
+        ]
+      }
+    ]
+  }
+}
+

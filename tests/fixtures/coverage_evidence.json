@@ -1,0 +1,92 @@
+{
+  "lastfm_tags": [
+    {
+      "tag": "rock",
+      "fetched_at": "2026-07-06T12:00:00Z"
+    },
+    {
+      "tag": "rock",
+      "fetched_at": "2026-07-13T12:00:00Z"
+    },
+    {
+      "tag": "garage rock",
+      "fetched_at": "2026-07-13T12:00:00Z"
+    }
+  ],
+  "lastfm_artists": [
+    {
+      "artist_name": "Neon Hours",
+      "mbid": "artist-rock",
+      "listeners": 100,
+      "playcount": 1000,
+      "tags": ["rock"],
+      "source_genres": ["rock"],
+      "fetched_at": "2026-07-06T12:15:00Z"
+    },
+    {
+      "artist_name": "Neon Hours",
+      "mbid": "artist-rock",
+      "listeners": 110,
+      "playcount": 1120,
+      "tags": ["rock"],
+      "source_genres": ["rock"],
+      "fetched_at": "2026-07-13T12:15:00Z"
+    },
+    {
+      "artist_name": "Static Engines",
+      "mbid": "artist-garage-rock",
+      "listeners": 40,
+      "playcount": 300,
+      "tags": ["garage rock"],
+      "source_genres": ["garage rock"],
+      "fetched_at": "2026-07-13T12:20:00Z"
+    }
+  ],
+  "musicbrainz_releases": [
+    {
+      "release_group_mbid": "release-rock",
+      "first_release_date": "2026-07-14",
+      "artist_credits": [
+        {
+          "artist_name": "Neon Hours",
+          "mbid": "artist-rock"
+        }
+      ],
+      "genres": ["rock"],
+      "tags": ["rock"],
+      "fetched_at": "2026-07-15T10:00:00Z"
+    },
+    {
+      "release_group_mbid": "release-ukg",
+      "first_release_date": "2026-07-15",
+      "artist_credits": [
+        {
+          "artist_name": "Night Transit",
+          "mbid": "artist-ukg"
+        }
+      ],
+      "genres": ["uk garage"],
+      "tags": ["UKG"],
+      "fetched_at": "2026-07-16T10:00:00Z"
+    }
+  ],
+  "bluesky_posts": [
+    {
+      "uri": "at://did:plc:test/app.bsky.feed.post/rock",
+      "created_at": "2026-07-14T18:00:00Z",
+      "ingested_at": "2026-07-14T18:00:01Z"
+    }
+  ],
+  "post_links": [
+    {
+      "post_uri": "at://did:plc:test/app.bsky.feed.post/rock",
+      "artist_mbid": "artist-rock",
+      "artist_name_raw": "Neon Hours",
+      "method": "direct_mbid",
+      "score": 100.0,
+      "join_key_type": "mbid",
+      "resolved_at": "2026-07-14T18:05:00Z"
+    }
+  ],
+  "post_ambiguities": []
+}

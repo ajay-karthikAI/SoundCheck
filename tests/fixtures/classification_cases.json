@@ -1,0 +1,79 @@
+[
+  {
+    "id": "bandcamp-link",
+    "post": {
+      "text": "Our record is out.",
+      "createdAt": "2026-07-20T12:00:00Z",
+      "langs": ["en"],
+      "facets": [
+        {
+          "features": [
+            {
+              "$type": "app.bsky.richtext.facet#link",
+              "uri": "https://artist.bandcamp.com/album/example"
+            }
+          ]
+        }
+      ]
+    },
+    "rules": ["link:bandcamp.com"]
+  },
+  {
+    "id": "case-insensitive-hashtag",
+    "post": {
+      "text": "This one is special #NeWmUsIc",
+      "createdAt": "2026-07-20T12:00:00Z",
+      "langs": ["en"]
+    },
+    "rules": ["hashtag:#newmusic"]
+  },
+  {
+    "id": "listening-intent",
+    "post": {
+      "text": "I am listening to the new album on repeat.",
+      "createdAt": "2026-07-20T12:00:00Z",
+      "langs": ["en"]
+    },
+    "rules": [
+      "intent:listening_to",
+      "intent:on_repeat",
+      "intent:new_album"
+    ]
+  },
+  {
+    "id": "dating-new-single",
+    "post": {
+      "text": "I'm a new single on a dating app.",
+      "createdAt": "2026-07-20T12:00:00Z",
+      "langs": ["en"]
+    },
+    "rules": []
+  },
+  {
+    "id": "sports-just-dropped",
+    "post": {
+      "text": "The receiver just dropped the ball in overtime.",
+      "createdAt": "2026-07-20T12:00:00Z",
+      "langs": ["en"]
+    },
+    "rules": []
+  },
+  {
+    "id": "np-no-problem",
+    "post": {
+      "text": "No problem, happy to help! #np",
+      "createdAt": "2026-07-20T12:00:00Z",
+      "langs": ["en"]
+    },
+    "rules": []
+  },
+  {
+    "id": "unfaceted-link-is-not-evidence",
+    "post": {
+      "text": "The word youtube.com is not a link facet.",
+      "createdAt": "2026-07-20T12:00:00Z",
+      "langs": ["en"]
+    },
+    "rules": []
+  }
+]

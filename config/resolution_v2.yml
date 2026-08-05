@@ -1,0 +1,19 @@
+taxonomy_version: "2.0.0"
+
+embedding:
+  cosine_floor: 0.55
+  multi_membership_margin: 0.05
+  max_memberships: 3
+  softmax_temperature: 0.10
+
+source_weights:
+  lastfm: 0.75
+  musicbrainz_genre: 1.0
+  musicbrainz_tag: 0.85
+
+activation:
+  minimum_labeled_examples_per_family: 20
+  minimum_precision: 0.90
+  minimum_recall: 0.75
+  minimum_mbid_precision: 0.98
+  minimum_overall_precision: 0.85

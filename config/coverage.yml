@@ -1,0 +1,13 @@
+taxonomy_version: "2.0.0"
+lookback_weeks: 52
+require_lastfm_tag: true
+min_unique_lastfm_artists: 25
+min_artists_with_consecutive_valid_snapshots: 10
+min_listening_history_weeks: 2
+min_musicbrainz_release_groups: 1
+min_resolved_bluesky_posts: 5
+min_resolution_attempts: 5
+min_resolution_rate: 0.85
+min_cross_source_overlap_artists: 2
+min_cross_source_overlap_rate: 0.10
+max_source_age_days: 14

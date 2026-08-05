@@ -1,0 +1,413 @@
+name: Soundcheck data pipeline
+
+on:
+  schedule:
+    - cron: "17 5 * * 0,2-6"
+    - cron: "47 6 * * 1"
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Pipeline depth
+        required: true
+        type: choice
+        default: weekly
+        options:
+          - daily
+          - weekly
+      cutover_taxonomy_v2:
+        description: Require every taxonomy-v2 cutover gate before publishing
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  actions: read
+  contents: read
+  issues: write
+
+concurrency:
+  group: soundcheck-data-pipeline
+  cancel-in-progress: false
+
+env:
+  UV_VERSION: "0.11.31"
+  RUN_KIND: ${{ github.event_name == 'workflow_dispatch' && inputs.mode || github.event.schedule == '47 6 * * 1' && 'weekly' || 'daily' }}
+  TAXONOMY_V2_CUTOVER_REQUESTED: ${{ github.event_name == 'workflow_dispatch' && inputs.cutover_taxonomy_v2 || false }}
+  PIPELINE_RUN_ID: gha-${{ github.run_id }}-${{ github.run_attempt }}
+  COLLECTION_RUN_KEY: gha-${{ github.run_id }}
+  LASTFM_API_KEY: ${{ secrets.LASTFM_API_KEY }}
+  MUSICBRAINZ_CONTACT_EMAIL: ${{ secrets.MUSICBRAINZ_CONTACT_EMAIL }}
+
+jobs:
+  pipeline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+
+    steps:
+      - name: Check out the default branch
+        uses: actions/checkout@v7
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Set up locked uv
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+        with:
+          version: ${{ env.UV_VERSION }}
+          enable-cache: true
+
+      - name: Restore the latest successful DuckDB artifact
+        id: restore
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          mkdir -p data restored
+          checkpoint_artifact="$(
+            gh api \
+              "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/artifacts" \
+              --jq '[.artifacts[]
+                | select(.name
+                  | startswith("soundcheck-duckdb-'"$GITHUB_RUN_ID"'-"))]
+                | sort_by(.created_at)
+                | last | .name // empty'
+          )"
+          if [[ -n "$checkpoint_artifact" ]]; then
+            gh run download "$GITHUB_RUN_ID" \
+              --name "$checkpoint_artifact" \
+              --dir restored
+            if [[ -f restored/data/soundcheck.duckdb ]]; then
+              cp restored/data/soundcheck.duckdb data/soundcheck.duckdb
+            else
+              cp restored/soundcheck.duckdb data/soundcheck.duckdb
+            fi
+            echo "restored_checkpoint=$checkpoint_artifact" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          previous_run="$(
+            gh run list \
+              --workflow weekly.yml \
+              --branch "$GITHUB_REF_NAME" \
+              --status success \
+              --limit 1 \
+              --json databaseId \
+              --jq '.[0].databaseId'
+          )"
+          if [[ -z "$previous_run" ]]; then
+            echo "No prior successful database artifact; starting cold."
+            exit 0
+          fi
+          artifact_name="$(
+            gh api \
+              "repos/$GITHUB_REPOSITORY/actions/runs/$previous_run/artifacts" \
+              --jq '[.artifacts[]
+                | select(.name | startswith("soundcheck-duckdb-"))]
+                | sort_by(.created_at)
+                | last | .name // empty'
+          )"
+          if [[ -z "$artifact_name" ]]; then
+            echo "Prior run has no database artifact; starting cold."
+            exit 0
+          fi
+          gh run download "$previous_run" \
+            --name "$artifact_name" \
+            --dir restored
+          if [[ -f restored/data/soundcheck.duckdb ]]; then
+            cp restored/data/soundcheck.duckdb data/soundcheck.duckdb
+          else
+            cp restored/soundcheck.duckdb data/soundcheck.duckdb
+          fi
+          echo "restored_run=$previous_run" >> "$GITHUB_OUTPUT"
+
+      - name: Install locked Python dependencies
+        run: uv sync --locked
+
+      - name: Validate collector secrets
+        run: |
+          : "${LASTFM_API_KEY:?Add LASTFM_API_KEY as a GitHub Actions secret}"
+          : "${MUSICBRAINZ_CONTACT_EMAIL:?Add MUSICBRAINZ_CONTACT_EMAIL as a GitHub Actions secret}"
+
+      - name: Pin the collection date across reruns
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          collection_as_of="$(
+            gh api "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
+              --jq '.created_at[0:10]'
+          )"
+          echo "COLLECTION_AS_OF=$collection_as_of" >> "$GITHUB_ENV"
+
+      - name: Plan safe collection shards
+        id: collection-plan
+        run: |
+          uv run python -m soundcheck.scripts.plan_collection \
+            --as-of "$COLLECTION_AS_OF" \
+            --format github >> "$GITHUB_OUTPUT"
+
+      - name: Cache the canonical-genre embedding model
+        if: env.RUN_KIND == 'weekly'
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/huggingface/hub
+          key: ${{ runner.os }}-huggingface-all-minilm-l6-v2-v1
+
+      - name: Set up Node for weekly verification
+        if: env.RUN_KIND == 'weekly'
+        uses: actions/setup-node@v6
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: soundcheck/web/package-lock.json
+
+      - name: Verify the Python application
+        if: env.RUN_KIND == 'weekly'
+        run: make lint typecheck test
+
+      - name: Verify the web application
+        if: env.RUN_KIND == 'weekly'
+        working-directory: soundcheck/web
+        run: |
+          npm ci
+          npm run fixtures
+          npm run lint
+          npm run typecheck
+          npm test
+          npm run build
+
+      - name: Start pipeline manifest
+        run: |
+          uv run python -m soundcheck.scripts.pipeline_manifest begin \
+            --run-id "$PIPELINE_RUN_ID" \
+            --run-kind "$RUN_KIND" \
+            --trigger "${{ github.event_name }}" \
+            --git-sha "$GITHUB_SHA"
+
+      - name: Collect public Bluesky conversation
+        run: |
+          uv run python -m soundcheck.ingest.bluesky.jetstream \
+            --duration-seconds 1200
+
+      - name: Poll due Bluesky engagement
+        run: make poll-bluesky-engagement
+
+      - name: Collect Last.fm listening snapshots
+        shell: bash
+        run: |
+          shard_count="${{ steps.collection-plan.outputs.lastfm_shard_count }}"
+          if [[ "$shard_count" -le 1 ]]; then
+            uv run python -m soundcheck.ingest.lastfm.collect \
+              --run-key "$COLLECTION_RUN_KEY"
+            exit 0
+          fi
+          for phase in tags artists; do
+            for ((shard_index=0; shard_index<shard_count; shard_index++)); do
+              uv run python -m soundcheck.ingest.lastfm.collect \
+                --run-key "$COLLECTION_RUN_KEY" \
+                --phase "$phase" \
+                --shard-count "$shard_count" \
+                --shard-index "$shard_index"
+            done
+          done
+          uv run python -m soundcheck.ingest.lastfm.collect \
+            --run-key "$COLLECTION_RUN_KEY" \
+            --phase finalize \
+            --shard-count "$shard_count"
+
+      - name: Collect MusicBrainz release supply
+        shell: bash
+        run: |
+          shard_count="${{ steps.collection-plan.outputs.musicbrainz_shard_count }}"
+          if [[ "$shard_count" -le 1 ]]; then
+            uv run python -m soundcheck.ingest.musicbrainz.collect \
+              --run-key "$COLLECTION_RUN_KEY" \
+              incremental \
+              --as-of "$COLLECTION_AS_OF"
+            exit 0
+          fi
+          for ((shard_index=0; shard_index<shard_count; shard_index++)); do
+            uv run python -m soundcheck.ingest.musicbrainz.collect \
+              --run-key "$COLLECTION_RUN_KEY" \
+              --phase collect \
+              --shard-count "$shard_count" \
+              --shard-index "$shard_index" \
+              incremental \
+              --as-of "$COLLECTION_AS_OF"
+          done
+          uv run python -m soundcheck.ingest.musicbrainz.collect \
+            --run-key "$COLLECTION_RUN_KEY" \
+            --phase finalize \
+            --shard-count "$shard_count" \
+            incremental \
+            --as-of "$COLLECTION_AS_OF"
+
+      - name: Resolve artists and canonical genres
+        if: env.RUN_KIND == 'weekly'
+        run: make resolve
+
+      - name: Resolve taxonomy-v2 genre memberships
+        if: env.RUN_KIND == 'weekly'
+        run: make resolve-v2
+
+      - name: Measure taxonomy-v2 source coverage
+        if: env.RUN_KIND == 'weekly'
+        run: make coverage
+
+      - name: Compute weekly metrics
+        if: env.RUN_KIND == 'weekly'
+        run: make metrics
+
+      - name: Compute taxonomy-v2 weekly metrics
+        if: env.RUN_KIND == 'weekly'
+        run: make metrics-v2
+
+      - name: Backtest and publish forecasts
+        if: env.RUN_KIND == 'weekly'
+        run: make forecast
+
+      - name: Backtest and publish taxonomy-v2 forecasts
+        if: env.RUN_KIND == 'weekly'
+        run: make forecast-v2
+
+      - name: Generate evidence-linked creator briefs
+        if: env.RUN_KIND == 'weekly'
+        run: make briefs
+
+      - name: Finish successful pipeline manifest
+        if: success()
+        run: |
+          uv run python -m soundcheck.scripts.pipeline_manifest finish \
+            --run-id "$PIPELINE_RUN_ID" \
+            --status success
+
+      - name: Compare taxonomy versions and enforce an explicit cutover
+        id: taxonomy-comparison
+        if: success() && env.RUN_KIND == 'weekly'
+        shell: bash
+        run: |
+          mkdir -p artifacts
+          uv run python scripts/compare_taxonomy_versions.py \
+            --format json \
+            --output artifacts/taxonomy-v2-comparison.json \
+            --quiet
+          cutover_passed="$(
+            jq --raw-output '.cutover_passed' \
+              artifacts/taxonomy-v2-comparison.json
+          )"
+          failed_gate_count="$(
+            jq --raw-output '.failed_gate_count' \
+              artifacts/taxonomy-v2-comparison.json
+          )"
+          echo "cutover_passed=$cutover_passed" >> "$GITHUB_OUTPUT"
+          echo "failed_gate_count=$failed_gate_count" >> "$GITHUB_OUTPUT"
+          jq '{
+            event,
+            taxonomy_version,
+            cutover_passed,
+            failed_gate_count,
+            cutover_action
+          }' artifacts/taxonomy-v2-comparison.json
+          if [[
+            "$TAXONOMY_V2_CUTOVER_REQUESTED" == "true"
+            && "$cutover_passed" != "true"
+          ]]; then
+            echo "Taxonomy-v2 cutover is blocked by measured gates."
+            exit 1
+          fi
+
+      - name: Finish failed pipeline manifest
+        if: failure() && hashFiles('data/soundcheck.duckdb') != ''
+        continue-on-error: true
+        run: |
+          uv run python -m soundcheck.scripts.pipeline_manifest finish \
+            --run-id "$PIPELINE_RUN_ID" \
+            --status failed \
+            --error-message "GitHub Actions run $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID failed"
+
+      - name: Upload immutable database artifact
+        if: always() && hashFiles('data/soundcheck.duckdb') != ''
+        uses: actions/upload-artifact@v7
+        with:
+          name: soundcheck-duckdb-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            data/soundcheck.duckdb
+            artifacts/taxonomy-v2-comparison.json
+          if-no-files-found: error
+          retention-days: 90
+          compression-level: 0
+
+      - name: Install deployment CLIs
+        if: success() && env.RUN_KIND == 'weekly'
+        run: npm install --global vercel@56.5.0
+
+      - name: Prepare the immutable Vercel API bundle
+        if: success() && env.RUN_KIND == 'weekly'
+        run: uv run python -m soundcheck.scripts.prepare_vercel_api
+
+      - name: Deploy the API artifact to Vercel
+        if: success() && env.RUN_KIND == 'weekly'
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_API_PROJECT_ID: ${{ secrets.VERCEL_API_PROJECT_ID }}
+        run: |
+          : "${VERCEL_TOKEN:?Add VERCEL_TOKEN as a GitHub Actions secret}"
+          : "${VERCEL_ORG_ID:?Add VERCEL_ORG_ID as a GitHub Actions secret}"
+          : "${VERCEL_API_PROJECT_ID:?Add VERCEL_API_PROJECT_ID as a GitHub Actions secret}"
+          VERCEL_PROJECT_ID="$VERCEL_API_PROJECT_ID" \
+            vercel deploy \
+              --prod \
+              --yes \
+              --token "$VERCEL_TOKEN" \
+              --cwd .vercel-api
+
+      - name: Wait for the production API
+        if: success() && env.RUN_KIND == 'weekly'
+        env:
+          SOUNDCHECK_API_URL: ${{ secrets.SOUNDCHECK_API_URL }}
+        run: |
+          : "${SOUNDCHECK_API_URL:?Add SOUNDCHECK_API_URL as a GitHub Actions secret}"
+          for attempt in {1..30}; do
+            if curl --fail --silent --show-error \
+              "$SOUNDCHECK_API_URL/api/health"; then
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "Production API did not become healthy in five minutes."
+          exit 1
+
+      - name: Notify maintainers about failures
+        if: failure()
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const title = "Soundcheck pipeline failure";
+            const body = [
+              `Run: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
+              `Mode: ${process.env.RUN_KIND}`,
+              `Commit: ${context.sha}`,
+            ].join("\n\n");
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: "open",
+              creator: "github-actions[bot]",
+            });
+            const existing = issues.find((issue) => issue.title === title);
+            if (existing) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existing.number,
+                body,
+              });
+            } else {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title,
+                body,
+              });
+            }

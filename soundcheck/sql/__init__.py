@@ -1,0 +1,2 @@
+"""Named DuckDB SQL resources."""
+

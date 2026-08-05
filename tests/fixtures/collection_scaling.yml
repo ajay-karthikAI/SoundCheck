@@ -1,0 +1,18 @@
+taxonomy_version: "2.0.0"
+safe_window_seconds: 60
+max_shards: 4
+
+lastfm:
+  requests_per_second: 4.0
+  tag_methods_per_tag: 3
+  expected_artists_per_unobserved_tag: 10
+  cache_hit_assumption: 0.0
+  artist_concurrency: 2
+
+musicbrainz:
+  requests_per_second: 1.0
+  page_size: 100
+  max_tags_per_query: 2
+  expected_pages_per_query: 2
+  cache_hit_assumption: 0.0
+  incremental_days: 14

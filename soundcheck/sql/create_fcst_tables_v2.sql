@@ -1,0 +1,143 @@
+SET TimeZone = 'UTC';
+
+CREATE SCHEMA IF NOT EXISTS fcst_;
+
+CREATE TABLE IF NOT EXISTS fcst_.backtest_ledger_v2 (
+    taxonomy_version VARCHAR NOT NULL,
+    genre_id VARCHAR NOT NULL,
+    macro_family_id VARCHAR NOT NULL,
+    popularity_tier VARCHAR NOT NULL,
+    context VARCHAR NOT NULL,
+    target_axis VARCHAR NOT NULL,
+    horizon INTEGER NOT NULL,
+    model_name VARCHAR NOT NULL,
+    origin_week DATE NOT NULL,
+    target_week DATE NOT NULL,
+    training_start_week DATE NOT NULL,
+    training_end_week DATE NOT NULL,
+    training_weeks INTEGER NOT NULL,
+    max_feature_week DATE NOT NULL,
+    actual DOUBLE NOT NULL,
+    prediction DOUBLE NOT NULL,
+    interval_low DOUBLE NOT NULL,
+    interval_high DOUBLE NOT NULL,
+    absolute_error DOUBLE NOT NULL,
+    covered_80 BOOLEAN NOT NULL,
+    PRIMARY KEY (
+        taxonomy_version,
+        genre_id,
+        context,
+        target_axis,
+        horizon,
+        model_name,
+        origin_week
+    )
+);
+
+CREATE TABLE IF NOT EXISTS fcst_.model_scores_v2 (
+    taxonomy_version VARCHAR NOT NULL,
+    validation_scope VARCHAR NOT NULL,
+    validation_group_id VARCHAR NOT NULL,
+    genre_id VARCHAR,
+    macro_family_id VARCHAR NOT NULL,
+    popularity_tier VARCHAR NOT NULL,
+    context VARCHAR NOT NULL,
+    target_axis VARCHAR NOT NULL,
+    horizon INTEGER NOT NULL,
+    model_name VARCHAR NOT NULL,
+    backtest_start_week DATE,
+    backtest_end_week DATE,
+    origin_count INTEGER NOT NULL,
+    mae DOUBLE,
+    naive_mae DOUBLE,
+    mase DOUBLE,
+    interval_coverage_80 DOUBLE,
+    mean_interval_width DOUBLE,
+    score_status VARCHAR NOT NULL,
+    evaluated_at TIMESTAMPTZ NOT NULL,
+    PRIMARY KEY (
+        taxonomy_version,
+        validation_scope,
+        validation_group_id,
+        context,
+        target_axis,
+        horizon,
+        model_name
+    )
+);
+
+CREATE TABLE IF NOT EXISTS fcst_.predictions_v2 (
+    taxonomy_version VARCHAR NOT NULL,
+    origin_week DATE,
+    target_week DATE,
+    genre_id VARCHAR NOT NULL,
+    display_name VARCHAR NOT NULL,
+    macro_family_id VARCHAR NOT NULL,
+    popularity_tier VARCHAR NOT NULL,
+    context VARCHAR NOT NULL,
+    target_axis VARCHAR NOT NULL,
+    horizon INTEGER NOT NULL,
+    forecast_status VARCHAR NOT NULL,
+    model_name VARCHAR,
+    prediction DOUBLE,
+    interval_low DOUBLE,
+    interval_high DOUBLE,
+    backtest_mase DOUBLE,
+    backtest_coverage_80 DOUBLE,
+    backtest_score_status VARCHAR,
+    family_backtest_mase DOUBLE,
+    family_backtest_coverage_80 DOUBLE,
+    family_backtest_score_status VARCHAR,
+    naive_prediction DOUBLE,
+    naive_interval_low DOUBLE,
+    naive_interval_high DOUBLE,
+    naive_backtest_mase DOUBLE,
+    naive_backtest_coverage_80 DOUBLE,
+    naive_backtest_score_status VARCHAR,
+    valid_training_weeks INTEGER NOT NULL,
+    training_start_week DATE,
+    training_end_week DATE,
+    created_at TIMESTAMPTZ NOT NULL,
+    PRIMARY KEY (
+        taxonomy_version,
+        genre_id,
+        context,
+        target_axis,
+        horizon
+    )
+);
+
+CREATE TABLE IF NOT EXISTS fcst_.next_up_v2 (
+    taxonomy_version VARCHAR NOT NULL,
+    origin_week DATE NOT NULL,
+    target_week DATE NOT NULL,
+    genre_id VARCHAR NOT NULL,
+    display_name VARCHAR NOT NULL,
+    macro_family_id VARCHAR NOT NULL,
+    parent_genre_id VARCHAR,
+    coverage_status VARCHAR NOT NULL,
+    context VARCHAR NOT NULL,
+    rank INTEGER NOT NULL,
+    predicted_opportunity DOUBLE NOT NULL,
+    predicted_opportunity_interval_low DOUBLE NOT NULL,
+    predicted_opportunity_interval_high DOUBLE NOT NULL,
+    predicted_gain DOUBLE NOT NULL,
+    gain_interval_low DOUBLE NOT NULL,
+    gain_interval_high DOUBLE NOT NULL,
+    conversation_model VARCHAR NOT NULL,
+    conversation_mase DOUBLE,
+    conversation_coverage_80 DOUBLE NOT NULL,
+    conversation_status VARCHAR NOT NULL,
+    listening_model VARCHAR NOT NULL,
+    listening_mase DOUBLE,
+    listening_coverage_80 DOUBLE NOT NULL,
+    listening_status VARCHAR NOT NULL,
+    skill_status VARCHAR NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL,
+    PRIMARY KEY (
+        taxonomy_version,
+        origin_week,
+        context,
+        genre_id
+    )
+);

@@ -1,0 +1,37 @@
+INSERT INTO fcst_.predictions_v2 (
+    taxonomy_version,
+    origin_week,
+    target_week,
+    genre_id,
+    display_name,
+    macro_family_id,
+    popularity_tier,
+    context,
+    target_axis,
+    horizon,
+    forecast_status,
+    model_name,
+    prediction,
+    interval_low,
+    interval_high,
+    backtest_mase,
+    backtest_coverage_80,
+    backtest_score_status,
+    family_backtest_mase,
+    family_backtest_coverage_80,
+    family_backtest_score_status,
+    naive_prediction,
+    naive_interval_low,
+    naive_interval_high,
+    naive_backtest_mase,
+    naive_backtest_coverage_80,
+    naive_backtest_score_status,
+    valid_training_weeks,
+    training_start_week,
+    training_end_week,
+    created_at
+)
+VALUES (
+    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+);

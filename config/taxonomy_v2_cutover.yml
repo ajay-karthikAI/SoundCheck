@@ -1,0 +1,33 @@
+taxonomy_version: "2.0.0"
+
+resolution:
+  minimum_labeled_examples_per_family: 20
+  minimum_precision: 0.90
+  minimum_recall: 0.75
+  minimum_mbid_precision: 0.98
+
+coverage:
+  minimum_ready_enabled_genres_per_family: 3
+  minimum_ready_enabled_genre_fraction: 0.60
+  minimum_cross_source_overlap_rate: 0.10
+
+history:
+  minimum_valid_metric_weeks: 8
+  minimum_genres_with_history_per_family: 3
+
+missingness:
+  maximum_enabled_genre_missing_fraction: 0.40
+  require_complete_ready_estimates: true
+
+forecast:
+  minimum_publishable_rows_per_family: 4
+  minimum_empirical_interval_coverage_80: 0.60
+  require_genre_and_family_validation: true
+  require_naive_baseline: true
+
+automation:
+  maximum_weekly_runtime_minutes: 300
+  maximum_collection_shards_per_source: 16
+  maximum_seconds_per_collection_shard: 1800
+  maximum_data_age_days: 14
+  require_successful_weekly_manifest: true

@@ -1,0 +1,11 @@
+{
+  "/api/briefs": ["get"],
+  "/api/ecosystem": ["get"],
+  "/api/evidence/bluesky": ["get"],
+  "/api/forecast/next-up": ["get"],
+  "/api/genres/opportunities": ["get"],
+  "/api/genres/{genre}/evidence": ["get"],
+  "/api/genres/{genre}/timeseries": ["get"],
+  "/api/health": ["get"],
+  "/api/scene-map": ["get"]
+}

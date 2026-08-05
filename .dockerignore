@@ -1,0 +1,15 @@
+.git
+.github
+.venv
+.cache
+.hypothesis
+.mypy_cache
+.pytest_cache
+.ruff_cache
+**/__pycache__
+**/*.pyc
+soundcheck/web/.next
+soundcheck/web/node_modules
+tests
+data/*
+!data/soundcheck.duckdb
