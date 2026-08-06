@@ -86,32 +86,23 @@ jobs:
             echo "restored_checkpoint=$checkpoint_artifact" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          previous_run="$(
-            gh run list \
-              --workflow weekly.yml \
-              --branch "$GITHUB_REF_NAME" \
-              --status success \
-              --limit 1 \
-              --json databaseId \
-              --jq '.[0].databaseId'
-          )"
-          if [[ -z "$previous_run" ]]; then
-            echo "No prior successful database artifact; starting cold."
-            exit 0
-          fi
-          artifact_name="$(
+          latest_artifact="$(
             gh api \
-              "repos/$GITHUB_REPOSITORY/actions/runs/$previous_run/artifacts" \
+              "repos/$GITHUB_REPOSITORY/actions/artifacts?per_page=100" \
               --jq '[.artifacts[]
+                | select(.expired == false)
                 | select(.name | startswith("soundcheck-duckdb-"))]
                 | sort_by(.created_at)
-                | last | .name // empty'
+                | last // empty
+                | [.workflow_run.id, .name]
+                | @tsv'
           )"
-          if [[ -z "$artifact_name" ]]; then
-            echo "Prior run has no database artifact; starting cold."
+          if [[ -z "$latest_artifact" ]]; then
+            echo "No prior database artifact; starting cold."
             exit 0
           fi
-          gh run download "$previous_run" \
+          read -r artifact_run artifact_name <<< "$latest_artifact"
+          gh run download "$artifact_run" \
             --name "$artifact_name" \
             --dir restored
           if [[ -f restored/data/soundcheck.duckdb ]]; then
@@ -119,7 +110,8 @@ jobs:
           else
             cp restored/soundcheck.duckdb data/soundcheck.duckdb
           fi
-          echo "restored_run=$previous_run" >> "$GITHUB_OUTPUT"
+          echo "restored_run=$artifact_run" >> "$GITHUB_OUTPUT"
+          echo "restored_artifact=$artifact_name" >> "$GITHUB_OUTPUT"
 
       - name: Install locked Python dependencies
         run: uv sync --locked
