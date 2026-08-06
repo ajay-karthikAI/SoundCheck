@@ -58,6 +58,40 @@ def test_query_uses_date_window_and_shared_genres() -> None:
 
 
 @pytest.mark.asyncio
+async def test_client_recovers_after_repeated_read_timeouts(
+    tmp_path: Path,
+) -> None:
+    attempts = 0
+    sleeps: list[float] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        nonlocal attempts
+        attempts += 1
+        if attempts <= 4:
+            raise httpx.ReadTimeout("fixture timeout", request=request)
+        return httpx.Response(200, json={"release-groups": []})
+
+    async def record_sleep(delay: float) -> None:
+        sleeps.append(delay)
+
+    async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as http_client:
+        client = MusicBrainzClient(
+            http_client,
+            limiter=NoopLimiter(),
+            cache=DiskJsonCache(tmp_path / "cache", max_age_seconds=None),
+            sleeper=record_sleep,
+        )
+        payload = await client.get(
+            "release-group",
+            {"query": "firstreleasedate:2026-08-06"},
+        )
+
+    assert payload == {"release-groups": []}
+    assert attempts == 5
+    assert sleeps == [1.0, 2.0, 4.0, 8.0]
+
+
+@pytest.mark.asyncio
 async def test_paginated_collection_is_insert_on_first_sight(
     tmp_path: Path,
     musicbrainz_pages: dict[str, Any],

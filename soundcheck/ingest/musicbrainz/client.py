@@ -1,4 +1,4 @@
-"""Async MusicBrainz client with strict 1 req/s and disk caching."""
+"""Async MusicBrainz client with strict 1 req/s, backoff, and disk caching."""
 
 from __future__ import annotations
 
@@ -21,6 +21,7 @@ from soundcheck.ingest.http import (
 MUSICBRAINZ_API_ROOT = "https://musicbrainz.org/ws/2"
 MUSICBRAINZ_USER_AGENT = "Soundcheck/0.1 ( contact-email )"
 MUSICBRAINZ_CACHE_MAX_AGE_SECONDS = 24 * 60 * 60
+MUSICBRAINZ_MAX_RETRY_DELAY_SECONDS = 60.0
 _JSON_OBJECT = TypeAdapter(dict[str, JsonValue])
 _RETRYABLE_HTTP_STATUS = frozenset({429, 500, 502, 503, 504})
 
@@ -46,7 +47,7 @@ class MusicBrainzClient:
         limiter: RateLimiter | None = None,
         cache: DiskJsonCache | None = None,
         sleeper: Sleeper = asyncio.sleep,
-        max_attempts: int = 4,
+        max_attempts: int = 8,
         user_agent: str = MUSICBRAINZ_USER_AGENT,
     ) -> None:
         if max_attempts <= 0:
@@ -94,7 +95,7 @@ class MusicBrainzClient:
                 if attempt == self._max_attempts:
                     raise
                 await self._sleeper(delay)
-                delay *= 2
+                delay = min(delay * 2, MUSICBRAINZ_MAX_RETRY_DELAY_SECONDS)
                 continue
 
             await self._cache.set(normalized_path, params, response.content)
