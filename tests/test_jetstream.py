@@ -9,8 +9,13 @@ from pathlib import Path
 
 import duckdb
 import pytest
+from websockets.exceptions import InvalidMessage
 
-from soundcheck.ingest.bluesky.jetstream import JetstreamIngestor, _jetstream_url
+from soundcheck.ingest.bluesky.jetstream import (
+    _RETRYABLE_CONNECTION_ERRORS,
+    JetstreamIngestor,
+    _jetstream_url,
+)
 from soundcheck.ingest.bluesky.models import RawBlueskyPost
 from soundcheck.ingest.bluesky.storage import PostBatchWriter
 from soundcheck.sql.loader import load_sql
@@ -100,3 +105,10 @@ def test_resume_url_advances_persisted_microsecond_cursor() -> None:
     assert _jetstream_url(1784552400000000).endswith(
         "cursor=1784552400000001"
     )
+
+
+def test_invalid_handshake_response_is_retryable() -> None:
+    error = InvalidMessage(
+        "unsupported protocol; expected HTTP/1.1: HTTP/1.0 503"
+    )
+    assert isinstance(error, _RETRYABLE_CONNECTION_ERRORS)

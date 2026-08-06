@@ -13,7 +13,7 @@ from pathlib import Path
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from websockets.asyncio.client import ClientConnection, connect
-from websockets.exceptions import ConnectionClosed
+from websockets.exceptions import ConnectionClosed, InvalidHandshake
 
 from soundcheck.ingest.bluesky.classify import is_music_post
 from soundcheck.ingest.bluesky.logging import (
@@ -27,6 +27,11 @@ from soundcheck.ingest.bluesky.storage import PostBatchWriter
 JETSTREAM_URL = (
     "wss://jetstream2.us-east.bsky.network/subscribe"
     "?wantedCollections=app.bsky.feed.post"
+)
+_RETRYABLE_CONNECTION_ERRORS = (
+    ConnectionClosed,
+    InvalidHandshake,
+    OSError,
 )
 
 
@@ -148,7 +153,7 @@ class JetstreamIngestor:
                     ) as websocket:
                         backoff_seconds = 1.0
                         await self._consume_connection(websocket, shutdown)
-                except (ConnectionClosed, OSError) as exc:
+                except _RETRYABLE_CONNECTION_ERRORS as exc:
                     if shutdown.is_set():
                         break
                     log_event(
