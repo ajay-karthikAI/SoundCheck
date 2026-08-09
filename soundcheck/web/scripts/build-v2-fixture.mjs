@@ -289,6 +289,8 @@ function mapEvidence(seed) {
           listeners_delta: artist.listeners_delta,
           fetched_at: artist.fetched_at,
           previous_fetched_at: "2026-07-06T23:30:00Z",
+          interval_days: 7,
+          listening_window_status: "valid_weekly",
           membership_weight: 1,
           membership_method: "exact_alias",
           membership_confidence: 0.98,

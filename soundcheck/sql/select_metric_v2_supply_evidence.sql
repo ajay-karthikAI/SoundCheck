@@ -29,6 +29,7 @@ WITH credit_memberships AS (
         release.first_release_date,
         '[0-9]{4}-[0-9]{2}-[0-9]{2}'
     )
+    AND try_cast(release.first_release_date AS DATE) IS NOT NULL
     GROUP BY
         release.release_group_mbid,
         release.first_release_date,
@@ -51,7 +52,7 @@ normalized AS (
 )
 SELECT
     CAST(
-        date_trunc('week', CAST(first_release_date AS DATE))
+        date_trunc('week', try_cast(first_release_date AS DATE))
         AS DATE
     ) AS week_start,
     canonical_genre_id,

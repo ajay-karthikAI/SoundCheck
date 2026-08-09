@@ -6,4 +6,3 @@ INSERT INTO raw_.bluesky_engagement (
     fetched_at
 )
 VALUES (?, ?, ?, ?, ?);
-

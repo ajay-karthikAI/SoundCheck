@@ -63,6 +63,8 @@ def _initialize(database_path: Path) -> None:
         for statement_name in (
             "create_stg_genre_resolution.sql",
             "create_mart_metrics.sql",
+            "create_mart_metrics_v2.sql",
+            "create_mart_metric_versions.sql",
             "create_mart_evidence.sql",
             "create_fcst_tables.sql",
             "create_mart_briefs.sql",

@@ -86,7 +86,7 @@ export default async function DiscoveryGapPage({
       />
       {provisional ? (
         <InlineNotice
-          message={`Showing the real observed discovery gap for ISO week ${provisionalResponse.ok ? provisionalResponse.data.week : ""}. This provisional view uses global within-week comparisons; taxonomy-v2 peer comparisons remain unavailable until the published coverage gates pass.`}
+          message={`Showing the latest complete eligible discovery-gap week ${provisionalResponse.ok ? provisionalResponse.data.week : ""}. This provisional view uses global within-week comparisons; current partial-week evidence is not ranked.`}
         />
       ) : null}
       {!openingResponse.ok && !provisional ? (

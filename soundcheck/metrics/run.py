@@ -5,7 +5,8 @@ from __future__ import annotations
 import argparse
 import asyncio
 import json
-from datetime import date
+from collections import Counter
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 from typing import Literal
 
@@ -88,11 +89,52 @@ class MetricsCompletion(BaseModel):
     bootstrap_resamples: int
 
 
+class AxisOperationalSummary(BaseModel):
+    """Source receipts, maturity states, and first decision-ready week."""
+
+    model_config = ConfigDict(frozen=True)
+
+    event: Literal["axis_operational_summary"] = "axis_operational_summary"
+    artifact_family: Literal["v1"] = "v1"
+    source_counts: dict[str, int]
+    maturity_states: dict[str, int]
+    first_eligible_complete_week: date | None
+
+
+def _axis_summary(batch: MetricsBatch) -> AxisOperationalSummary:
+    states: Counter[str] = Counter()
+    for row in batch.axis_maturity:
+        states[row.conversation_maturity] += 1
+        states[row.listening_maturity] += 1
+        states[row.supply_maturity] += 1
+    complete_weeks = {
+        row.week_start for row in batch.axis_maturity if row.decision_ready
+    }
+    return AxisOperationalSummary(
+        source_counts={
+            "bluesky_posts": len(batch.post_maturity),
+            "bluesky_mature_posts": sum(
+                row.engagement_maturity_status == "complete"
+                for row in batch.post_maturity
+            ),
+            "lastfm_valid_artist_genre_weeks": sum(
+                row.valid_listening_artist_count for row in batch.axis_maturity
+            ),
+            "musicbrainz_release_genre_weeks": sum(
+                row.supply_release_group_count for row in batch.axis_maturity
+            ),
+        },
+        maturity_states=dict(sorted(states.items())),
+        first_eligible_complete_week=min(complete_weeks) if complete_weeks else None,
+    )
+
+
 async def async_main(settings: MetricSettings) -> MetricsBatch:
     """Load evidence, calculate all statistics, and replace both marts."""
     store = DuckDBMetricStore(settings.database_path)
     await store.initialize()
-    evidence = await store.load_evidence()
+    metric_time = datetime.now(UTC)
+    evidence = await store.load_evidence(as_of=metric_time)
     embeddings = await store.load_scene_embeddings()
     canonical_genres = load_taxonomy(
         settings.canonical_genres_path
@@ -101,6 +143,7 @@ async def async_main(settings: MetricSettings) -> MetricsBatch:
         build_metrics,
         evidence,
         canonical_genres,
+        computed_at=metric_time,
         bootstrap_resamples=settings.bootstrap_resamples,
     )
     scene_map_points = await asyncio.to_thread(
@@ -112,8 +155,10 @@ async def async_main(settings: MetricSettings) -> MetricsBatch:
         genre_weeks=metrics_batch.genre_weeks,
         ecosystem_weeks=metrics_batch.ecosystem_weeks,
         scene_map_points=scene_map_points,
+        axis_maturity=metrics_batch.axis_maturity,
+        post_maturity=metrics_batch.post_maturity,
     )
-    await store.replace(batch)
+    await store.replace_corrected(batch, evidence)
     return batch
 
 
@@ -121,7 +166,19 @@ def _ranking(
     batch: MetricsBatch,
     metric: Literal["opportunity", "discovery_gap"],
 ) -> MetricRanking:
-    if not batch.genre_weeks:
+    current_week = datetime.now(UTC).date()
+    current_week -= timedelta(days=current_week.weekday())
+    eligible_rows = tuple(
+        row
+        for row in batch.genre_weeks
+        if row.week_start < current_week
+        and (
+            row.opportunity is not None
+            if metric == "opportunity"
+            else row.discovery_gap is not None
+        )
+    )
+    if not eligible_rows:
         return MetricRanking(
             metric=metric,
             week_start=None,
@@ -129,9 +186,9 @@ def _ranking(
             top=(),
             bottom=(),
         )
-    latest_week = max(row.week_start for row in batch.genre_weeks)
+    latest_week = max(row.week_start for row in eligible_rows)
     items: list[RankingItem] = []
-    for row in batch.genre_weeks:
+    for row in eligible_rows:
         if row.week_start != latest_week:
             continue
         if metric == "opportunity":
@@ -163,11 +220,18 @@ def _ranking(
 
 
 def _ecosystem_summary(batch: MetricsBatch) -> EcosystemSummary:
-    if not batch.ecosystem_weeks:
+    current_week = datetime.now(UTC).date()
+    current_week -= timedelta(days=current_week.weekday())
+    complete = tuple(
+        row
+        for row in batch.ecosystem_weeks
+        if row.week_start < current_week and row.listening_observed_genres > 0
+    )
+    if not complete:
         return EcosystemSummary(status="unavailable", row=None)
     return EcosystemSummary(
         status="ready",
-        row=max(batch.ecosystem_weeks, key=lambda row: row.week_start),
+        row=max(complete, key=lambda row: row.week_start),
     )
 
 
@@ -206,6 +270,7 @@ def main() -> None:
         bootstrap_resamples=args.bootstrap_resamples,
     )
     batch = asyncio.run(async_main(settings))
+    _emit(_axis_summary(batch))
     _emit(_ranking(batch, "opportunity"))
     _emit(_ranking(batch, "discovery_gap"))
     _emit(_ecosystem_summary(batch))

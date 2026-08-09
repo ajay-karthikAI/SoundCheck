@@ -10,6 +10,7 @@ from datetime import UTC, date, datetime, timedelta
 import numpy as np
 import numpy.typing as npt
 
+from soundcheck.metrics.maturity import build_axis_maturity
 from soundcheck.metrics.models import (
     EcosystemWeekMetric,
     GenreWeekMetric,
@@ -139,6 +140,15 @@ def build_metrics(
     conversation_cells = _aggregate_conversation(evidence)
     listening_cells = _aggregate_listening(evidence)
     supply_cells = _aggregate_supply(evidence)
+    all_weeks = tuple(
+        sorted(
+            {
+                *(item.week_start for item in evidence.conversation),
+                *(item.week_start for item in evidence.listening_candidates),
+                *(item.week_start for item in evidence.supply),
+            }
+        )
+    )
     weeks = tuple(
         sorted(
             {
@@ -150,14 +160,64 @@ def build_metrics(
         )
     )
     if not weeks:
-        return MetricsBatch(genre_weeks=(), ecosystem_weeks=())
+        maturity_rows = build_axis_maturity(
+            artifact_family="v1",
+            taxonomy_version="v1",
+            weeks=all_weeks,
+            genre_ids=genres,
+            conversation=tuple(
+                (item.canonical_genre.casefold(), item)
+                for item in evidence.conversation
+            ),
+            listening=tuple(
+                (item.canonical_genre.casefold(), item)
+                for item in evidence.listening_candidates
+            ),
+            supply=tuple(
+                (item.canonical_genre.casefold(), item)
+                for item in evidence.supply
+            ),
+            supply_windows=evidence.supply_windows,
+            computed_at=metric_time,
+        )
+        return MetricsBatch(
+            genre_weeks=(),
+            ecosystem_weeks=(),
+            axis_maturity=maturity_rows,
+            post_maturity=evidence.post_maturity,
+        )
 
+    maturity_rows = build_axis_maturity(
+        artifact_family="v1",
+        taxonomy_version="v1",
+        weeks=all_weeks,
+        genre_ids=genres,
+        conversation=tuple(
+            (item.canonical_genre.casefold(), item)
+            for item in evidence.conversation
+        ),
+        listening=tuple(
+            (item.canonical_genre.casefold(), item)
+            for item in evidence.listening_candidates
+        ),
+        supply=tuple(
+            (item.canonical_genre.casefold(), item)
+            for item in evidence.supply
+        ),
+        supply_windows=evidence.supply_windows,
+        computed_at=metric_time,
+    )
+    decision_ready = {
+        (row.week_start, row.genre_id): row.decision_ready
+        for row in maturity_rows
+    }
     arrays = _calculate_arrays(
         weeks,
         genres,
         conversation_cells,
         listening_cells,
         supply_cells,
+        decision_ready,
         bootstrap_resamples=bootstrap_resamples,
         bootstrap_seed=bootstrap_seed,
     )
@@ -183,6 +243,8 @@ def build_metrics(
     return MetricsBatch(
         genre_weeks=genre_rows,
         ecosystem_weeks=ecosystem_rows,
+        axis_maturity=maturity_rows,
+        post_maturity=evidence.post_maturity,
     )
 
 
@@ -191,6 +253,11 @@ def _aggregate_conversation(
 ) -> dict[CellKey, _ConversationCell]:
     cells: dict[CellKey, _ConversationCell] = defaultdict(_ConversationCell)
     for item in evidence.conversation:
+        if item.engagement_maturity_status != "complete":
+            continue
+        assert item.likes is not None
+        assert item.reposts is not None
+        assert item.replies is not None
         cell = cells[(item.week_start, item.canonical_genre.casefold())]
         cell.mentions += item.mentions
         cell.likes += item.likes
@@ -206,6 +273,8 @@ def _aggregate_listening(
 ) -> dict[CellKey, _ListeningCell]:
     artist_deltas: dict[ArtistCellKey, list[int]] = defaultdict(lambda: [0, 0])
     for item in evidence.listening_candidates:
+        if item.listening_window_status != "valid_weekly":
+            continue
         previous = (
             None
             if item.previous_playcount is None or item.previous_listeners is None
@@ -254,6 +323,7 @@ def _calculate_arrays(
     conversation_cells: dict[CellKey, _ConversationCell],
     listening_cells: dict[CellKey, _ListeningCell],
     supply_cells: dict[CellKey, _SupplyCell],
+    decision_ready: dict[CellKey, bool],
     *,
     bootstrap_resamples: int,
     bootstrap_seed: int,
@@ -405,6 +475,14 @@ def _calculate_arrays(
     discovery_gap_bootstrap = (
         listening_index_bootstrap - conversation_index_bootstrap
     )
+    for week_index, week in enumerate(weeks):
+        for genre_index, genre in enumerate(genres):
+            if decision_ready.get((week, genre), False):
+                continue
+            opportunity[week_index, genre_index] = np.nan
+            discovery_gap[week_index, genre_index] = np.nan
+            opportunity_bootstrap[week_index, :, genre_index] = np.nan
+            discovery_gap_bootstrap[week_index, :, genre_index] = np.nan
     return _MetricArrays(
         weeks=weeks,
         genres=genres,

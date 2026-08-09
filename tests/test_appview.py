@@ -13,7 +13,9 @@ import pytest
 from soundcheck.ingest.bluesky.appview import (
     AppViewClient,
     due_engagement_uris,
+    eligible_engagement_tasks,
     poll_engagement,
+    poll_engagement_tasks,
 )
 from soundcheck.ingest.bluesky.models import (
     AppViewGetPostsResponse,
@@ -71,12 +73,16 @@ async def test_appview_batches_25_and_appends_repolls(tmp_path: Path) -> None:
             client,
             writer,
             fetched_at=first_poll,
+            poll_target_hours=24,
+            poll_status="scheduled",
         ) == 26
         assert await poll_engagement(
             uris,
             client,
             writer,
             fetched_at=second_poll,
+            poll_target_hours=72,
+            poll_status="scheduled",
         ) == 26
 
     assert requested_batch_sizes == [25, 1, 25, 1]
@@ -85,6 +91,85 @@ async def test_appview_batches_25_and_appends_repolls(tmp_path: Path) -> None:
             load_sql("summarize_raw_bluesky_engagement.sql")
         ).fetchone()
     assert result == (52, 2)
+
+
+@pytest.mark.asyncio
+async def test_overdue_recovery_is_resumable_and_append_only(tmp_path: Path) -> None:
+    database_path = tmp_path / "overdue.duckdb"
+    as_of = datetime(2026, 7, 24, 12, tzinfo=UTC)
+    post_writer = PostBatchWriter(database_path)
+    await post_writer.initialize()
+    await post_writer.add(
+        RawBlueskyPost(
+            uri="at://did:plc:test/app.bsky.feed.post/overdue",
+            did="did:plc:test",
+            created_at=as_of - timedelta(hours=100),
+            text="Listening to Slowdive",
+            langs=("en",),
+            link_urls=(),
+            hashtags=(),
+            matched_rules=("intent:listening_to",),
+            ingested_at=as_of - timedelta(hours=100),
+        )
+    )
+    await post_writer.flush()
+    tasks = await eligible_engagement_tasks(
+        database_path,
+        as_of=as_of,
+        overdue=True,
+        limit=10,
+    )
+    assert tuple(
+        (task.uri, task.poll_target_hours, task.poll_status) for task in tasks
+    ) == (
+        (
+            "at://did:plc:test/app.bsky.feed.post/overdue",
+            72,
+            "overdue_recovery",
+        ),
+    )
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        uri = request.url.params.get_list("uris")[0]
+        return httpx.Response(
+            200,
+            json={
+                "posts": [
+                    {
+                        "uri": uri,
+                        "likeCount": 9,
+                        "repostCount": 2,
+                        "replyCount": 1,
+                    }
+                ]
+            },
+        )
+
+    writer = EngagementWriter(database_path)
+    async with httpx.AsyncClient(
+        transport=httpx.MockTransport(handler)
+    ) as http_client:
+        assert await poll_engagement_tasks(
+            tasks,
+            AppViewClient(http_client),
+            writer,
+            fetched_at=as_of,
+        ) == 1
+
+    assert await eligible_engagement_tasks(
+        database_path,
+        as_of=as_of + timedelta(hours=1),
+        overdue=True,
+        limit=10,
+    ) == ()
+    with duckdb.connect(str(database_path), read_only=True) as connection:
+        rows = connection.execute(
+            """
+            SELECT poll_target_hours, poll_status, like_count
+            FROM raw_.bluesky_engagement
+            """
+        ).fetchall()
+    assert rows == [(72, "overdue_recovery", 9)]
 
 
 @pytest.mark.asyncio
@@ -129,3 +214,5 @@ async def test_due_polls_select_24h_and_72h_windows_once(
     assert await due_engagement_uris(database_path, as_of=as_of) == (
         "at://did:plc:test/app.bsky.feed.post/72",
     )
+    tasks = await eligible_engagement_tasks(database_path, as_of=as_of)
+    assert tuple(task.poll_target_hours for task in tasks) == (72,)

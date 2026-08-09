@@ -7,6 +7,7 @@ WITH snapshot_base AS (
             ELSE 'name:' || lower(trim(artist_name))
         END AS artist_key,
         artist_name,
+        nullif(mbid, '') AS mbid,
         playcount,
         listeners,
         tags,
@@ -30,6 +31,7 @@ ordered_snapshots AS (
     SELECT
         artist_key,
         artist_name,
+        mbid,
         playcount,
         listeners,
         tags,
@@ -42,7 +44,11 @@ ordered_snapshots AS (
         lag(listeners) OVER (
             PARTITION BY artist_key
             ORDER BY fetched_at
-        ) AS previous_listeners
+        ) AS previous_listeners,
+        lag(fetched_at) OVER (
+            PARTITION BY artist_key
+            ORDER BY fetched_at
+        ) AS previous_fetched_at
     FROM weekly_snapshots
 ),
 artist_tags AS (
@@ -77,10 +83,13 @@ SELECT
     genre.canonical_genre,
     snapshot.artist_key,
     snapshot.artist_name,
+    snapshot.mbid,
     snapshot.playcount,
     snapshot.listeners,
     snapshot.previous_playcount,
-    snapshot.previous_listeners
+    snapshot.previous_listeners,
+    snapshot.previous_fetched_at,
+    snapshot.fetched_at
 FROM ordered_snapshots AS snapshot
 INNER JOIN artist_genres AS genre
     ON

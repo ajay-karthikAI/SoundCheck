@@ -218,9 +218,15 @@ class LastfmEvidence(ApiModel):
     artist_mbid: str | None
     playcount_delta: int = Field(ge=0)
     listeners_delta: int = Field(ge=0)
+    previous_fetched_at: datetime | None
     fetched_at: datetime
+    interval_days: float | None = Field(default=None, gt=0)
+    listening_window_status: Literal["valid_weekly", "legacy_unvalidated"]
 
     _fetched_at_utc = field_validator("fetched_at")(_as_utc)
+    _previous_fetched_at_utc = field_validator("previous_fetched_at")(
+        lambda value: None if value is None else _as_utc(value)
+    )
 
 
 class ArtistCredit(ApiModel):

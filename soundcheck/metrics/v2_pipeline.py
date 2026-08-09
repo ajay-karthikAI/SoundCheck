@@ -12,6 +12,7 @@ from typing import Literal
 import numpy as np
 import numpy.typing as npt
 
+from soundcheck.metrics.maturity import GenreWeekAxisMaturity, build_axis_maturity
 from soundcheck.metrics.statistics import (
     bootstrap_sum,
     cumulative_delta,
@@ -147,6 +148,8 @@ def _aggregate_evidence(
 ]:
     conversation: dict[CellKey, _ConversationCell] = defaultdict(_ConversationCell)
     for conversation_item in evidence.conversation:
+        if conversation_item.engagement_maturity_status != "complete":
+            continue
         conversation_cell = conversation[
             (conversation_item.week_start, conversation_item.genre_id)
         ]
@@ -159,6 +162,8 @@ def _aggregate_evidence(
         tuple[float, float, float],
     ] = {}
     for listening_item in evidence.listening_candidates:
+        if listening_item.listening_window_status != "valid_weekly":
+            continue
         previous = (
             None
             if listening_item.previous_playcount is None
@@ -279,6 +284,7 @@ def _context_points(
 def _build_arrays(
     evidence: MetricEvidenceV2,
     taxonomy: GenreTaxonomy,
+    maturity_by_key: dict[CellKey, GenreWeekAxisMaturity],
     *,
     bootstrap_resamples: int,
     bootstrap_seed: int,
@@ -321,17 +327,24 @@ def _build_arrays(
             conversation = conversation_cells.get(key)
             listening = listening_cells.get(key)
             supply = supply_cells.get(key)
+            maturity = maturity_by_key[key]
             coverage_ready = coverage.eligibility_state == "ready"
             evidence_ready = (
                 conversation is not None
                 and listening is not None
                 and supply is not None
             )
-            is_eligible = coverage_ready and evidence_ready
+            is_eligible = coverage_ready and evidence_ready and maturity.decision_ready
             eligible[week_index, genre_index] = is_eligible
             week_statuses.append(
                 "ready"
                 if is_eligible
+                else maturity.conversation_maturity
+                if coverage_ready and maturity.conversation_maturity != "complete"
+                else maturity.listening_maturity
+                if coverage_ready and maturity.listening_maturity != "complete"
+                else maturity.supply_maturity
+                if coverage_ready and maturity.supply_maturity != "complete"
                 else "evidence_mismatch"
                 if coverage_ready
                 else coverage.eligibility_state
@@ -1181,9 +1194,29 @@ def build_metrics_v2(
             estimates=(),
             ecosystem_weeks=(),
         )
+    weeks = tuple(sorted({row.week_start for row in evidence.coverage}))
+    genre_ids = tuple(genre.genre_id for genre in taxonomy.genres)
+    maturity_rows = build_axis_maturity(
+        artifact_family="v2",
+        taxonomy_version=taxonomy.taxonomy_version,
+        weeks=weeks,
+        genre_ids=genre_ids,
+        conversation=tuple((item.genre_id, item) for item in evidence.conversation),
+        listening=tuple(
+            (item.genre_id, item) for item in evidence.listening_candidates
+        ),
+        supply=tuple((item.genre_id, item) for item in evidence.supply),
+        supply_windows=evidence.supply_windows,
+        computed_at=metric_time,
+    )
+    maturity_by_key = {
+        (row.week_start, row.genre_id): row
+        for row in maturity_rows
+    }
     arrays, conversation_cells, listening_cells, supply_cells = _build_arrays(
         evidence,
         taxonomy,
+        maturity_by_key,
         bootstrap_resamples=bootstrap_resamples,
         bootstrap_seed=bootstrap_seed,
     )
@@ -1480,7 +1513,11 @@ def build_metrics_v2(
             membership_confidence=row.membership_confidence,
         )
         for row in evidence.conversation
-        if row.did is not None
+        if row.engagement_maturity_status == "complete"
+        and row.likes is not None
+        and row.reposts is not None
+        and row.replies is not None
+        and row.did is not None
         and row.created_at is not None
         and row.text is not None
         and row.artist_name_raw is not None
@@ -1507,6 +1544,8 @@ def build_metrics_v2(
             listeners_delta=row.listeners - row.previous_listeners,
             fetched_at=row.fetched_at,
             previous_fetched_at=row.previous_fetched_at,
+            interval_days=row.interval_days,
+            listening_window_status="valid_weekly",
             membership_weight=row.membership_weight,
             membership_method=row.membership_method,
             membership_confidence=row.membership_confidence,
@@ -1515,8 +1554,9 @@ def build_metrics_v2(
         if row.artist_name is not None
         and row.previous_playcount is not None
         and row.previous_listeners is not None
-        and row.fetched_at is not None
         and row.previous_fetched_at is not None
+        and row.interval_days is not None
+        and row.listening_window_status == "valid_weekly"
         and row.membership_method is not None
         and row.membership_confidence is not None
         and row.playcount >= row.previous_playcount
@@ -1551,4 +1591,5 @@ def build_metrics_v2(
         conversation_evidence=conversation_receipts,
         listening_evidence=listening_receipts,
         supply_evidence=supply_receipts,
+        axis_maturity=maturity_rows,
     )

@@ -35,6 +35,7 @@ from soundcheck.forecast.models import (
     NextUpPrediction,
 )
 from soundcheck.forecast.storage import DuckDBForecastStore
+from soundcheck.metrics.maturity import SupplyCollectionWindow
 from soundcheck.metrics.models import GenreWeekMetric, MetricsBatch, SceneMapPoint
 from soundcheck.metrics.pipeline import build_metrics
 from soundcheck.metrics.storage import DuckDBMetricStore
@@ -230,7 +231,17 @@ async def seed_demo_database(settings: DemoSettings) -> DemoSummary:
     metric_store = DuckDBMetricStore(settings.output_path)
     await metric_store.initialize()
     _insert_source_rows(settings.output_path, source_rows)
-    evidence = await metric_store.load_evidence()
+    evidence = (await metric_store.load_evidence()).model_copy(
+        update={
+            "supply_windows": (
+                SupplyCollectionWindow(
+                    start_date=weeks[0],
+                    end_date=weeks[-1] + timedelta(days=6),
+                    completed_at=computed_at,
+                ),
+            )
+        }
+    )
     metrics = build_metrics(
         evidence,
         DEMO_GENRES,

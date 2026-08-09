@@ -29,6 +29,14 @@ and estimate states remain explicit. Receipt IDs may remain attached for
 auditing. Missing evidence is never zero-filled or admitted to a z-score
 population.
 
+Operational maturity is an additional gate, independent of coverage. A v2
+genre-week cannot become estimate-eligible until its 72-hour AppView
+engagement, consecutive-week Last.fm delta, and fully collected closed
+MusicBrainz window are all complete. The batch records
+`conversation_pending`, `listening_pending`, and `supply_pending` explicitly in
+`mart_.genre_week_axis_maturity`; any pending axis keeps decision estimates
+null. The open current ISO week is always observational `supply_pending`.
+
 ## Weighted Evidence Attribution
 
 Let \(m_{ag}\in(0,1]\) be artist \(a\)'s v2 membership weight for genre \(g\).
@@ -47,16 +55,23 @@ receipt. Preferred post-artist links are MBID-first, then name fallback.
 ### Listening change
 
 Last.fm totals are cumulative lifetime counters. Snapshots are collapsed to
-the latest observation per MBID-first artist and ISO week, then ordered. For
-current snapshot \(j\):
+the latest observation per MBID-first artist and ISO week, then ordered. Every
+retained pair carries `previous_fetched_at`, `fetched_at`, exact
+`interval_days`, and `listening_window_status`. For current snapshot \(j\):
 
 \[
 \Delta P_j=P_j-P_{j-1},\qquad
 \Delta U_j=U_j-U_{j-1}.
 \]
 
-The first observation is excluded. If either counter decreases, the interval
-is excluded as a source correction. Nothing is clipped or zero-filled.
+Only `listening_window_status = valid_weekly` enters the estimate: both rows
+must be append-only observations, the prior row must be from the immediately
+preceding ISO week, the current timestamp must be later, and both counters must
+be monotone. First observations, same-week duplicates, nonconsecutive and
+missing-week pairs, invalid order, and source corrections remain audit rows but
+are excluded. Nothing is clipped, zero-filled, or time-normalized. In
+particular, an 11-day delta is not divided into synthetic daily or weekly
+values.
 
 \[
 A_{g,t}
@@ -267,6 +282,15 @@ G^c_{g,t}=z^{A,c}_{g,t}-z^{C,c}_{g,t}.
 Global opportunity compares all eligible genres. Peer opportunity compares
 within the broad family. Positive discovery gap means listening change is
 ahead of music conversation; negative means conversation is ahead.
+
+Opportunity and discovery gap are `NULL` whenever no valid weekly listening
+window survives for the genre-week, even if conversation and supply are
+present. Corrected v2 metrics are derivation-versioned independently of
+`taxonomy_version`; legacy v2 tables and other derivations remain unchanged.
+Only a validated active derivation is read by production surfaces.
+
+Ranked surfaces select the latest complete eligible ISO week strictly before
+the current UTC week. Partial current-week evidence is observational only.
 
 ## Uncertainty
 

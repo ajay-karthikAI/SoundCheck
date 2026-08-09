@@ -280,6 +280,8 @@ class ListeningReceiptV2(ApiModel):
     listeners_delta: int = Field(ge=0)
     fetched_at: datetime
     previous_fetched_at: datetime
+    interval_days: float = Field(gt=0.0)
+    listening_window_status: Literal["valid_weekly", "legacy_unvalidated"]
     membership_weight: float = Field(gt=0.0, le=1.0)
     membership_method: str
     membership_confidence: float = Field(ge=0.0, le=1.0)

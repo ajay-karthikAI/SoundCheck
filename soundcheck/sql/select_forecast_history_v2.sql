@@ -49,13 +49,13 @@ SELECT
     ) AS supply_spike,
     base.conversation_effective_n,
     base.listening_effective_n
-FROM mart_.genre_weekly_v2 AS base
+FROM mart_.genre_weekly_v2_production AS base
 CROSS JOIN contexts
 LEFT JOIN mart_.genre_coverage_v2 AS coverage
     ON coverage.taxonomy_version = base.taxonomy_version
     AND coverage.week_start = base.week_start
     AND coverage.genre_id = base.genre_id
-LEFT JOIN mart_.metric_estimates_v2 AS estimate
+LEFT JOIN mart_.metric_estimates_v2_production AS estimate
     ON estimate.taxonomy_version = base.taxonomy_version
     AND estimate.week_start = base.week_start
     AND estimate.scope_type = 'genre'

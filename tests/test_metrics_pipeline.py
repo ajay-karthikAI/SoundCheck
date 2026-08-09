@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
 import duckdb
 import pytest
 
+from soundcheck.metrics.maturity import SupplyCollectionWindow
 from soundcheck.metrics.pipeline import build_metrics
 from soundcheck.metrics.storage import DuckDBMetricStore
 from soundcheck.sql.loader import load_sql
@@ -108,8 +109,8 @@ async def test_metrics_pipeline_persists_deltas_indices_and_receipts(
         connection.executemany(
             load_sql("insert_raw_bluesky_engagement.sql"),
             [
-                ("at://post/a", 4, 2, 1, post_time),
-                ("at://post/b", 0, 0, 0, post_time),
+                    ("at://post/a", 4, 2, 1, post_time + timedelta(hours=72)),
+                    ("at://post/b", 0, 0, 0, post_time + timedelta(hours=72)),
             ],
         )
         connection.executemany(
@@ -189,7 +190,17 @@ async def test_metrics_pipeline_persists_deltas_indices_and_receipts(
             ),
         )
 
-    evidence = await store.load_evidence()
+    evidence = (await store.load_evidence()).model_copy(
+        update={
+            "supply_windows": (
+                SupplyCollectionWindow(
+                    start_date=date(2026, 7, 13),
+                    end_date=date(2026, 7, 19),
+                    completed_at=datetime(2026, 7, 20, 8, tzinfo=UTC),
+                ),
+            )
+        }
+    )
     batch = build_metrics(
         evidence,
         genres,

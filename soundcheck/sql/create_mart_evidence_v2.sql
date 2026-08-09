@@ -40,11 +40,20 @@ CREATE TABLE IF NOT EXISTS mart_.listening_evidence_v2 (
     listeners_delta BIGINT NOT NULL,
     fetched_at TIMESTAMPTZ NOT NULL,
     previous_fetched_at TIMESTAMPTZ NOT NULL,
+    interval_days DOUBLE NOT NULL,
+    listening_window_status VARCHAR NOT NULL,
     membership_weight DOUBLE NOT NULL,
     membership_method VARCHAR NOT NULL,
     membership_confidence DOUBLE NOT NULL,
-    PRIMARY KEY (taxonomy_version, week_start, genre_id, artist_key)
+    PRIMARY KEY (taxonomy_version, week_start, genre_id, artist_key),
+    CHECK (listening_window_status = 'valid_weekly')
 );
+
+ALTER TABLE mart_.listening_evidence_v2
+ADD COLUMN IF NOT EXISTS interval_days DOUBLE;
+
+ALTER TABLE mart_.listening_evidence_v2
+ADD COLUMN IF NOT EXISTS listening_window_status VARCHAR;
 
 CREATE TABLE IF NOT EXISTS mart_.supply_evidence_v2 (
     taxonomy_version VARCHAR NOT NULL,

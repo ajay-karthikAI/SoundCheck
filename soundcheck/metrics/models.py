@@ -4,7 +4,20 @@ from __future__ import annotations
 
 from datetime import UTC, date, datetime
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+
+from soundcheck.metrics.listening_windows import (
+    ListeningWindowStatus,
+    classify_listening_window,
+    interval_days,
+    iso_week_start,
+)
+from soundcheck.metrics.maturity import (
+    GenreWeekAxisMaturity,
+    PostEngagementMaturity,
+    PostEngagementMaturityStatus,
+    SupplyCollectionWindow,
+)
 
 
 def _as_utc(value: datetime) -> datetime:
@@ -23,12 +36,33 @@ class ConversationEvidence(BaseModel):
     canonical_genre: str
     post_uri: str
     mentions: int = Field(ge=0)
-    likes: int = Field(ge=0)
-    reposts: int = Field(ge=0)
-    replies: int = Field(ge=0)
+    likes: int | None = Field(default=None, ge=0)
+    reposts: int | None = Field(default=None, ge=0)
+    replies: int | None = Field(default=None, ge=0)
+    engagement_fetched_at: datetime | None = None
+    engagement_maturity_status: PostEngagementMaturityStatus = "complete"
+
+    _engagement_fetched_at_utc = field_validator("engagement_fetched_at")(
+        lambda value: None if value is None else _as_utc(value)
+    )
+
+    @model_validator(mode="after")
+    def validate_engagement_missingness(self) -> ConversationEvidence:
+        counts = (self.likes, self.reposts, self.replies)
+        if self.engagement_maturity_status == "complete":
+            if any(value is None for value in counts):
+                raise ValueError("complete engagement requires non-null counts")
+        elif any(value is not None for value in counts):
+            raise ValueError("pending engagement counts must remain null")
+        return self
 
     @property
     def weighted_score(self) -> float:
+        if self.engagement_maturity_status != "complete":
+            raise ValueError("pending engagement cannot enter a conversation score")
+        assert self.likes is not None
+        assert self.reposts is not None
+        assert self.replies is not None
         return (
             float(self.mentions)
             + 0.5 * self.likes
@@ -38,7 +72,7 @@ class ConversationEvidence(BaseModel):
 
 
 class ListeningDeltaCandidate(BaseModel):
-    """One consecutive-snapshot candidate before monotonicity validation."""
+    """One latest weekly snapshot and its explicitly audited predecessor."""
 
     model_config = ConfigDict(frozen=True)
 
@@ -46,10 +80,46 @@ class ListeningDeltaCandidate(BaseModel):
     canonical_genre: str
     artist_key: str
     artist_name: str
+    artist_mbid: str | None = None
     playcount: int = Field(ge=0)
     listeners: int = Field(ge=0)
     previous_playcount: int | None = Field(default=None, ge=0)
     previous_listeners: int | None = Field(default=None, ge=0)
+    previous_fetched_at: datetime | None = None
+    fetched_at: datetime
+    interval_days: float | None = None
+    observations_append_only: bool = True
+    listening_window_status: ListeningWindowStatus | None = None
+
+    _fetched_at_utc = field_validator("fetched_at")(_as_utc)
+    _previous_fetched_at_utc = field_validator("previous_fetched_at")(
+        lambda value: None if value is None else _as_utc(value)
+    )
+
+    @model_validator(mode="after")
+    def validate_window_metadata(self) -> ListeningDeltaCandidate:
+        if self.week_start != iso_week_start(self.fetched_at):
+            raise ValueError("week_start must match fetched_at's ISO week")
+        expected_days = interval_days(self.previous_fetched_at, self.fetched_at)
+        expected_status = classify_listening_window(
+            previous_fetched_at=self.previous_fetched_at,
+            fetched_at=self.fetched_at,
+            previous_playcount=self.previous_playcount,
+            playcount=self.playcount,
+            previous_listeners=self.previous_listeners,
+            listeners=self.listeners,
+            observations_append_only=self.observations_append_only,
+        )
+        if self.interval_days is not None and self.interval_days != expected_days:
+            raise ValueError("interval_days must equal the exact snapshot interval")
+        if (
+            self.listening_window_status is not None
+            and self.listening_window_status != expected_status
+        ):
+            raise ValueError("listening_window_status does not match snapshot metadata")
+        object.__setattr__(self, "interval_days", expected_days)
+        object.__setattr__(self, "listening_window_status", expected_status)
+        return self
 
 
 class SupplyEvidence(BaseModel):
@@ -172,6 +242,8 @@ class MetricEvidence(BaseModel):
     conversation: tuple[ConversationEvidence, ...]
     listening_candidates: tuple[ListeningDeltaCandidate, ...]
     supply: tuple[SupplyEvidence, ...]
+    supply_windows: tuple[SupplyCollectionWindow, ...] = ()
+    post_maturity: tuple[PostEngagementMaturity, ...] = ()
 
 
 class CanonicalGenreEmbedding(BaseModel):
@@ -212,3 +284,5 @@ class MetricsBatch(BaseModel):
     genre_weeks: tuple[GenreWeekMetric, ...]
     ecosystem_weeks: tuple[EcosystemWeekMetric, ...]
     scene_map_points: tuple[SceneMapPoint, ...] = ()
+    axis_maturity: tuple[GenreWeekAxisMaturity, ...] = ()
+    post_maturity: tuple[PostEngagementMaturity, ...] = ()

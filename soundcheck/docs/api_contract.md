@@ -264,7 +264,10 @@ never derives them from lifetime totals.
       "artist_mbid": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
       "playcount_delta": 1250,
       "listeners_delta": 84,
-      "fetched_at": "2026-07-19T23:30:00Z"
+      "previous_fetched_at": "2026-07-12T23:30:00Z",
+      "fetched_at": "2026-07-19T23:30:00Z",
+      "interval_days": 7.0,
+      "listening_window_status": "valid_weekly"
     }
   ],
   "musicbrainz_releases": [

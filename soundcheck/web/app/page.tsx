@@ -94,7 +94,7 @@ export default async function MarketOpeningsPage({
       />
       {provisional ? (
         <InlineNotice
-          message={`Showing real observed signals for ISO week ${provisionalResponse.ok ? provisionalResponse.data.week : ""}. These are provisional global comparisons from consecutive Last.fm snapshots, Bluesky conversation, and MusicBrainz releases. Taxonomy-v2 peer rankings remain gated until their stricter coverage checks pass.`}
+          message={`Showing the latest complete eligible ISO week ${provisionalResponse.ok ? provisionalResponse.data.week : ""}. These are provisional global comparisons from consecutive-week Last.fm snapshots, Bluesky conversation, and MusicBrainz releases. Current partial-week evidence is not ranked.`}
         />
       ) : null}
       {!openingResponse.ok && !provisional ? (

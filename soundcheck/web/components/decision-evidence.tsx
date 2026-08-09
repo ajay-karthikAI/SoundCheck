@@ -103,6 +103,12 @@ export function DecisionEvidence({
                 <p className="numeral mt-1 text-[9px] text-white/30">
                   +{artist.playcount_delta.toLocaleString("en")} plays
                 </p>
+                <p className="numeral mt-1 text-[9px] text-white/30">
+                  {artist.interval_days.toFixed(1)}-day observed window ·{" "}
+                  {artist.listening_window_status === "valid_weekly"
+                    ? "valid weekly"
+                    : "legacy audit pending"}
+                </p>
               </div>
             </a>
           ))}

@@ -33,8 +33,8 @@ class NoopLimiter:
 
 def test_incremental_window_is_14_inclusive_days() -> None:
     assert incremental_window(date(2026, 7, 23)) == (
-        date(2026, 7, 10),
-        date(2026, 7, 23),
+        date(2026, 7, 6),
+        date(2026, 7, 19),
     )
 
 

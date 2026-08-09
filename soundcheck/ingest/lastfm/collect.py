@@ -90,6 +90,13 @@ class _ArtistReference:
     source_genres: set[str] = field(default_factory=set)
 
 
+def weekly_run_key(as_of: datetime) -> str:
+    """Return one stable Last.fm checkpoint key per UTC ISO week."""
+
+    iso = as_of.astimezone(UTC).date().isocalendar()
+    return f"lastfm-{iso.year}-W{iso.week:02d}"
+
+
 async def collect_lastfm(
     genres: Sequence[str],
     client: LastfmClient,
@@ -470,7 +477,7 @@ def main() -> None:
         genres_path=args.genres,
         cache_directory=args.cache,
         scaling_config_path=args.scaling_config,
-        run_key=args.run_key or f"lastfm-{datetime.now(UTC).date().isoformat()}",
+        run_key=args.run_key or weekly_run_key(datetime.now(UTC)),
         phase=args.phase,
         shard_count=args.shard_count,
         shard_index=args.shard_index,

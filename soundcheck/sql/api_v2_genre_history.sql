@@ -1,6 +1,6 @@
 WITH recent_weeks AS (
     SELECT week_start
-    FROM mart_.genre_weekly_v2
+    FROM mart_.genre_weekly_v2_production
     WHERE taxonomy_version = ? AND genre_id = ?
     ORDER BY week_start DESC
     LIMIT ?
@@ -90,7 +90,7 @@ estimates AS (
         max(ci_high) FILTER (
             WHERE metric_name = 'discovery_gap'
         ) AS discovery_gap_high
-    FROM mart_.metric_estimates_v2
+    FROM mart_.metric_estimates_v2_production
     WHERE
         taxonomy_version = ?
         AND scope_type = 'genre'
@@ -130,7 +130,7 @@ SELECT
     estimate.discovery_gap,
     estimate.discovery_gap_low,
     estimate.discovery_gap_high
-FROM mart_.genre_weekly_v2 AS base
+FROM mart_.genre_weekly_v2_production AS base
 JOIN recent_weeks USING (week_start)
 LEFT JOIN estimates AS estimate USING (week_start)
 WHERE base.taxonomy_version = ? AND base.genre_id = ?

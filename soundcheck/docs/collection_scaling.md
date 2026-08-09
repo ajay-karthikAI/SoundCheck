@@ -76,6 +76,14 @@ lifetime snapshots; weekly listening change is still calculated only from
 consecutive snapshots, first observations remain excluded, and missing first
 deltas are never zero-filled.
 
+The scheduled pipeline does not repeat this expensive phase while waiting for
+the other axes. Monday performs the one weekly Last.fm run. Daily runs then use
+the read-only promotion planner to skip metrics, forecasts, briefs, and deploys
+until a newly closed genre-week clears conversation, listening, supply, and v2
+coverage gates. The first daily run that observes a newer eligible week runs
+the downstream chain once; subsequent retries are no-ops until another week is
+eligible.
+
 ## MusicBrainz Run Protocol
 
 Incremental collection retains the inclusive trailing 14-day

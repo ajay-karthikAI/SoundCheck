@@ -14,7 +14,7 @@ import pytest
 
 from soundcheck.ingest.http import DiskJsonCache
 from soundcheck.ingest.lastfm.client import LastfmClient
-from soundcheck.ingest.lastfm.collect import collect_lastfm
+from soundcheck.ingest.lastfm.collect import collect_lastfm, weekly_run_key
 from soundcheck.ingest.lastfm.models import TagGetTopAlbumsResponse
 from soundcheck.ingest.lastfm.storage import LastfmSnapshotWriter
 from soundcheck.sql.loader import load_sql
@@ -23,6 +23,22 @@ from soundcheck.sql.loader import load_sql
 class NoopLimiter:
     async def acquire(self) -> None:
         return None
+
+
+def test_weekly_run_key_and_workflow_timing_are_stable() -> None:
+    monday = datetime(2026, 7, 20, 6, 47, tzinfo=UTC)
+    assert weekly_run_key(monday) == "lastfm-2026-W30"
+    assert weekly_run_key(monday.replace(day=26, hour=23)) == "lastfm-2026-W30"
+    assert weekly_run_key(monday.replace(day=27)) == "lastfm-2026-W31"
+
+    workflow = Path(".github/workflows/weekly.yml").read_text()
+    assert 'cron: "47 6 * * 1"' in workflow
+    lastfm_step = workflow.split(
+        "- name: Collect Last.fm listening snapshots",
+        maxsplit=1,
+    )[1].split("- name: Collect MusicBrainz release supply", maxsplit=1)[0]
+    assert "if: env.RUN_KIND == 'weekly'" in lastfm_step
+    assert "lastfm_run_key" in lastfm_step
 
 
 def test_top_albums_accepts_live_and_legacy_envelopes(

@@ -464,6 +464,8 @@ signal:
       "listeners_delta": 20,
       "fetched_at": "2026-07-27T00:05:00Z",
       "previous_fetched_at": "2026-07-20T00:05:00Z",
+      "interval_days": 7.0,
+      "listening_window_status": "valid_weekly",
       "membership_weight": 1.0,
       "membership_method": "exact_alias",
       "membership_confidence": 0.99

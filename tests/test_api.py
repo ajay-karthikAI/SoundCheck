@@ -14,6 +14,7 @@ from fastapi.testclient import TestClient
 
 from soundcheck.api.app import create_app
 from soundcheck.api.config import ApiSettings
+from soundcheck.metrics.maturity import SupplyCollectionWindow
 from soundcheck.metrics.models import (
     EcosystemWeekMetric,
     GenreWeekMetric,
@@ -275,7 +276,17 @@ def _build_fixture_database(database_path: Path) -> None:
     store = DuckDBMetricStore(database_path)
     asyncio.run(store.initialize())
     _insert_source_fixtures(database_path)
-    evidence = asyncio.run(store.load_evidence())
+    evidence = asyncio.run(store.load_evidence()).model_copy(
+        update={
+            "supply_windows": (
+                SupplyCollectionWindow(
+                    start_date=CURRENT_WEEK,
+                    end_date=CURRENT_WEEK + timedelta(days=6),
+                    completed_at=COMPUTED_AT,
+                ),
+            )
+        }
+    )
     latest = build_metrics(
         evidence,
         ("shoegaze", "ambient", "other"),
@@ -439,8 +450,8 @@ def _insert_source_fixtures(database_path: Path) -> None:
         connection.executemany(
             load_sql("insert_raw_bluesky_engagement.sql"),
             [
-                ("at://post/a", 4, 2, 1, post_time),
-                ("at://post/b", 0, 0, 0, post_time),
+                ("at://post/a", 4, 2, 1, post_time + timedelta(hours=72)),
+                ("at://post/b", 0, 0, 0, post_time + timedelta(hours=72)),
             ],
         )
         connection.executemany(

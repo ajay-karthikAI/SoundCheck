@@ -211,6 +211,8 @@ export type ListeningReceipt = {
   listeners_delta: number;
   fetched_at: string;
   previous_fetched_at: string;
+  interval_days: number;
+  listening_window_status: "valid_weekly" | "legacy_unvalidated";
   membership_weight: number;
   membership_method: string;
   membership_confidence: number;

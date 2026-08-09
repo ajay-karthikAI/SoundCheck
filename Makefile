@@ -3,7 +3,7 @@ include .env
 export LASTFM_API_KEY
 endif
 
-.PHONY: lint typecheck test ingest-bluesky poll-bluesky-engagement plan-collection ingest-lastfm ingest-lastfm-shard finalize-lastfm ingest-musicbrainz ingest-musicbrainz-shard finalize-musicbrainz backfill-musicbrainz resolve resolve-v2 eval-resolution-v2 generate-resolution-v2-eval coverage report-coverage metrics metrics-v2 forecast forecast-v2 compare-taxonomies briefs api demo-data demo-api
+.PHONY: lint typecheck test ingest-bluesky poll-bluesky-engagement recover-bluesky-engagement plan-collection plan-promotion ingest-lastfm ingest-lastfm-shard finalize-lastfm ingest-musicbrainz ingest-musicbrainz-shard finalize-musicbrainz backfill-musicbrainz resolve resolve-v2 eval-resolution-v2 generate-resolution-v2-eval coverage report-coverage metrics metrics-v2 forecast forecast-v2 compare-taxonomies briefs api demo-data demo-api
 
 lint:
 	uv run ruff check .
@@ -20,8 +20,14 @@ ingest-bluesky:
 poll-bluesky-engagement:
 	uv run python -m soundcheck.ingest.bluesky.appview --due
 
+recover-bluesky-engagement:
+	uv run python -m soundcheck.ingest.bluesky.appview --overdue
+
 plan-collection:
 	uv run python -m soundcheck.scripts.plan_collection
+
+plan-promotion:
+	uv run python -m soundcheck.scripts.plan_promotion
 
 ingest-lastfm:
 	uv run python -m soundcheck.ingest.lastfm.collect

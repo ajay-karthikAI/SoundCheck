@@ -139,7 +139,6 @@ jobs:
             --format github >> "$GITHUB_OUTPUT"
 
       - name: Cache the canonical-genre embedding model
-        if: env.RUN_KIND == 'weekly'
         uses: actions/cache@v5
         with:
           path: ~/.cache/huggingface/hub
@@ -182,28 +181,32 @@ jobs:
             --duration-seconds 1200
 
       - name: Poll due Bluesky engagement
-        run: make poll-bluesky-engagement
+        run: |
+          make poll-bluesky-engagement
+          make recover-bluesky-engagement
 
       - name: Collect Last.fm listening snapshots
+        if: env.RUN_KIND == 'weekly'
         shell: bash
         run: |
           shard_count="${{ steps.collection-plan.outputs.lastfm_shard_count }}"
+          run_key="${{ steps.collection-plan.outputs.lastfm_run_key }}"
           if [[ "$shard_count" -le 1 ]]; then
             uv run python -m soundcheck.ingest.lastfm.collect \
-              --run-key "$COLLECTION_RUN_KEY"
+              --run-key "$run_key"
             exit 0
           fi
           for phase in tags artists; do
             for ((shard_index=0; shard_index<shard_count; shard_index++)); do
               uv run python -m soundcheck.ingest.lastfm.collect \
-                --run-key "$COLLECTION_RUN_KEY" \
+                --run-key "$run_key" \
                 --phase "$phase" \
                 --shard-count "$shard_count" \
                 --shard-index "$shard_index"
             done
           done
           uv run python -m soundcheck.ingest.lastfm.collect \
-            --run-key "$COLLECTION_RUN_KEY" \
+            --run-key "$run_key" \
             --phase finalize \
             --shard-count "$shard_count"
 
@@ -235,35 +238,51 @@ jobs:
             --as-of "$COLLECTION_AS_OF"
 
       - name: Resolve artists and canonical genres
-        if: env.RUN_KIND == 'weekly'
         run: make resolve
 
       - name: Resolve taxonomy-v2 genre memberships
-        if: env.RUN_KIND == 'weekly'
         run: make resolve-v2
 
       - name: Measure taxonomy-v2 source coverage
-        if: env.RUN_KIND == 'weekly'
         run: make coverage
 
+      - name: Plan decision-ready promotion
+        id: promotion
+        shell: bash
+        run: |
+          promotion_output="$(
+            uv run python -m soundcheck.scripts.plan_promotion \
+              --format github
+          )"
+          printf '%s\n' "$promotion_output"
+          printf '%s\n' "$promotion_output" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Node for daily promotion
+        if: env.RUN_KIND == 'daily' && steps.promotion.outputs.promotion_required == 'true'
+        uses: actions/setup-node@v6
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: soundcheck/web/package-lock.json
+
       - name: Compute weekly metrics
-        if: env.RUN_KIND == 'weekly'
+        if: env.RUN_KIND == 'weekly' || steps.promotion.outputs.promotion_required == 'true'
         run: make metrics
 
       - name: Compute taxonomy-v2 weekly metrics
-        if: env.RUN_KIND == 'weekly'
+        if: env.RUN_KIND == 'weekly' || steps.promotion.outputs.promotion_required == 'true'
         run: make metrics-v2
 
       - name: Backtest and publish forecasts
-        if: env.RUN_KIND == 'weekly'
+        if: env.RUN_KIND == 'weekly' || steps.promotion.outputs.promotion_required == 'true'
         run: make forecast
 
       - name: Backtest and publish taxonomy-v2 forecasts
-        if: env.RUN_KIND == 'weekly'
+        if: env.RUN_KIND == 'weekly' || steps.promotion.outputs.promotion_required == 'true'
         run: make forecast-v2
 
       - name: Generate evidence-linked creator briefs
-        if: env.RUN_KIND == 'weekly'
+        if: env.RUN_KIND == 'weekly' || steps.promotion.outputs.promotion_required == 'true'
         run: make briefs
 
       - name: Finish successful pipeline manifest
@@ -275,7 +294,7 @@ jobs:
 
       - name: Compare taxonomy versions and enforce an explicit cutover
         id: taxonomy-comparison
-        if: success() && env.RUN_KIND == 'weekly'
+        if: success() && (env.RUN_KIND == 'weekly' || steps.promotion.outputs.promotion_required == 'true')
         shell: bash
         run: |
           mkdir -p artifacts
@@ -330,15 +349,15 @@ jobs:
           compression-level: 0
 
       - name: Install deployment CLIs
-        if: success() && env.RUN_KIND == 'weekly'
+        if: success() && (env.RUN_KIND == 'weekly' || steps.promotion.outputs.promotion_required == 'true')
         run: npm install --global vercel@56.5.0
 
       - name: Prepare the immutable Vercel API bundle
-        if: success() && env.RUN_KIND == 'weekly'
+        if: success() && (env.RUN_KIND == 'weekly' || steps.promotion.outputs.promotion_required == 'true')
         run: uv run python -m soundcheck.scripts.prepare_vercel_api
 
       - name: Deploy the API artifact to Vercel
-        if: success() && env.RUN_KIND == 'weekly'
+        if: success() && (env.RUN_KIND == 'weekly' || steps.promotion.outputs.promotion_required == 'true')
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
@@ -355,7 +374,7 @@ jobs:
               --cwd .vercel-api
 
       - name: Wait for the production API
-        if: success() && env.RUN_KIND == 'weekly'
+        if: success() && (env.RUN_KIND == 'weekly' || steps.promotion.outputs.promotion_required == 'true')
         env:
           SOUNDCHECK_API_URL: ${{ secrets.SOUNDCHECK_API_URL }}
         run: |

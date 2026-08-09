@@ -29,7 +29,7 @@ WITH recent AS (
         discovery_gap,
         discovery_gap_ci_low,
         discovery_gap_ci_high
-    FROM mart_.genre_weekly
+    FROM mart_.genre_weekly_production
     WHERE lower(canonical_genre) = lower(?)
     ORDER BY week_start DESC
     LIMIT ?

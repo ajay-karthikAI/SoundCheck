@@ -5,17 +5,18 @@ WITH latest_run AS (
     LIMIT 1
 )
 SELECT
-    (SELECT max(week_start) FROM mart_.genre_weekly) AS latest_metric_week,
+    (SELECT max(week_start) FROM mart_.genre_weekly_production) AS latest_metric_week,
     (SELECT max(target_week) FROM fcst_.predictions) AS latest_forecast_week,
     (
         SELECT max(week_start)
-        FROM mart_.genre_weekly
+        FROM mart_.genre_weekly_production
         WHERE
             opportunity IS NOT NULL
+            AND week_start < CAST(date_trunc('week', current_timestamp) AS DATE)
             AND week_start
                 < CAST(date_trunc('week', current_date) AS DATE)
     ) AS latest_complete_week,
-    (SELECT count(*) FROM mart_.genre_weekly) AS metric_rows,
+    (SELECT count(*) FROM mart_.genre_weekly_production) AS metric_rows,
     (SELECT count(*) FROM fcst_.predictions) AS forecast_rows,
     latest_run.run_id,
     latest_run.run_kind,

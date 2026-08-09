@@ -111,7 +111,8 @@ def test_dry_run_plan_is_conservative_and_makes_no_network_calls(
     assert plan.lastfm.requests_per_second == 4.0
     assert plan.musicbrainz.expected_pages == 4
     assert plan.musicbrainz.requests_per_second == 1.0
-    assert plan.incremental_start_date == date(2026, 7, 14)
+    assert plan.incremental_start_date == date(2026, 7, 13)
+    assert plan.incremental_end_date == date(2026, 7, 26)
 
 
 @pytest.mark.asyncio

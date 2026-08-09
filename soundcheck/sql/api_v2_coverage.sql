@@ -18,7 +18,7 @@ SELECT
     coverage.supply_missing,
     coverage.stale
 FROM mart_.genre_coverage_v2 AS coverage
-LEFT JOIN mart_.genre_weekly_v2 AS genre
+LEFT JOIN mart_.genre_weekly_v2_production AS genre
     ON genre.taxonomy_version = coverage.taxonomy_version
     AND genre.week_start = coverage.week_start
     AND genre.genre_id = coverage.genre_id

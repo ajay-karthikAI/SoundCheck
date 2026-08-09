@@ -9,6 +9,7 @@ import duckdb
 import pytest
 
 from soundcheck.metrics.coverage import GenreCoverageRow
+from soundcheck.metrics.maturity import SupplyCollectionWindow
 from soundcheck.metrics.v2_models import (
     ConversationEvidenceV2,
     ListeningCandidateV2,
@@ -166,6 +167,7 @@ def _fixture_evidence() -> MetricEvidenceV2:
             membership_weight=1.0,
             playcount=1_000,
             listeners=100,
+            fetched_at=datetime(2026, 7, 16, 12, tzinfo=UTC),
         )
         for index, genre_id in enumerate(_NORMAL_GENRES)
     )
@@ -181,6 +183,8 @@ def _fixture_evidence() -> MetricEvidenceV2:
             listeners=100 + delta[1],
             previous_playcount=1_000,
             previous_listeners=100,
+            fetched_at=datetime(2026, 7, 23, 12, tzinfo=UTC),
+            previous_fetched_at=datetime(2026, 7, 16, 12, tzinfo=UTC),
         )
         for index, (genre_id, delta) in enumerate(
             zip(_NORMAL_GENRES, deltas, strict=True)
@@ -203,6 +207,13 @@ def _fixture_evidence() -> MetricEvidenceV2:
         listening_candidates=(*first_snapshots, *second_snapshots),
         supply=supply,
         coverage=coverage,
+        supply_windows=(
+            SupplyCollectionWindow(
+                start_date=_SECOND_WEEK,
+                end_date=date(2026, 7, 26),
+                completed_at=_COMPUTED_AT,
+            ),
+        ),
     )
 
 
@@ -346,3 +357,43 @@ async def test_v2_storage_replaces_only_one_taxonomy_version(
         ("2.0.0", len(original.genre_weeks)),
         ("2.1.0", len(other_version.genre_weeks)),
     ]
+
+
+@pytest.mark.asyncio
+async def test_corrected_v2_storage_audits_windows_without_rewriting_legacy(
+    tmp_path: Path,
+) -> None:
+    taxonomy = load_taxonomy(_TAXONOMY_PATH)
+    evidence = _fixture_evidence()
+    batch = build_metrics_v2(
+        evidence,
+        taxonomy,
+        computed_at=_COMPUTED_AT,
+        bootstrap_resamples=20,
+        bootstrap_seed=3,
+    )
+    database_path = tmp_path / "corrected-v2.duckdb"
+    store = DuckDBMetricV2Store(database_path)
+    await store.initialize()
+
+    await store.replace_corrected(batch, evidence)
+
+    with duckdb.connect(str(database_path), read_only=True) as connection:
+        legacy_count = connection.execute(
+            "SELECT count(*) FROM mart_.genre_weekly_v2"
+        ).fetchone()
+        corrected_count = connection.execute(
+            "SELECT count(*) FROM mart_.genre_weekly_v2_versioned"
+        ).fetchone()
+        statuses = connection.execute(
+            """
+            SELECT listening_window_status, count(*)
+            FROM mart_.lastfm_listening_windows
+            WHERE artifact_family = 'v2'
+            GROUP BY listening_window_status
+            ORDER BY listening_window_status
+            """
+        ).fetchall()
+    assert legacy_count == (0,)
+    assert corrected_count == (len(batch.genre_weeks),)
+    assert statuses == [("first_observation", 3), ("valid_weekly", 3)]

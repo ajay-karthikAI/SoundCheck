@@ -7,7 +7,7 @@ import json
 import math
 from collections import defaultdict
 from collections.abc import Callable, Iterable, Sequence
-from datetime import UTC, date, datetime, timedelta
+from datetime import UTC, date, datetime
 from pathlib import Path
 from typing import Literal
 
@@ -15,6 +15,7 @@ import duckdb
 import yaml
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
+from soundcheck.ingest.musicbrainz.windows import incremental_window
 from soundcheck.sql.loader import load_sql
 from soundcheck.taxonomy import DEFAULT_TAXONOMY_PATH, load_taxonomy, normalize_alias
 
@@ -297,11 +298,14 @@ def build_collection_plan(
     config = load_scaling_config(config_path)
     if taxonomy.taxonomy_version != config.taxonomy_version:
         raise ValueError("collection scaling and taxonomy versions must match")
-    start_date = as_of - timedelta(days=config.musicbrainz.incremental_days - 1)
+    start_date, end_date = incremental_window(
+        as_of,
+        days=config.musicbrainz.incremental_days,
+    )
     candidates, observed_tags, recent_release_count = _planner_evidence(
         database_path,
         start_date=start_date,
-        end_date=as_of,
+        end_date=end_date,
     )
 
     lastfm_tags = taxonomy.collection_tags_v2("lastfm")
@@ -344,7 +348,7 @@ def build_collection_plan(
         taxonomy_version=taxonomy.taxonomy_version,
         generated_at=generated_at or datetime.now(UTC),
         incremental_start_date=start_date,
-        incremental_end_date=as_of,
+        incremental_end_date=end_date,
         lastfm=SourceCollectionPlan(
             source="lastfm",
             tags=lastfm_tags,

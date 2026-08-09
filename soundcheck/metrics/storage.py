@@ -3,10 +3,17 @@
 from __future__ import annotations
 
 import asyncio
+from datetime import UTC, datetime
 from pathlib import Path
 
 import duckdb
 
+from soundcheck.metrics.listening_windows import LASTFM_WINDOW_DERIVATION_VERSION
+from soundcheck.metrics.maturity import (
+    GenreWeekAxisMaturity,
+    PostEngagementMaturity,
+    SupplyCollectionWindow,
+)
 from soundcheck.metrics.models import (
     CanonicalGenreEmbedding,
     ConversationEvidence,
@@ -30,8 +37,16 @@ class DuckDBMetricStore:
     async def initialize(self) -> None:
         await asyncio.to_thread(_initialize, self._database_path)
 
-    async def load_evidence(self) -> MetricEvidence:
-        return await asyncio.to_thread(_load_evidence, self._database_path)
+    async def load_evidence(
+        self,
+        *,
+        as_of: datetime | None = None,
+    ) -> MetricEvidence:
+        return await asyncio.to_thread(
+            _load_evidence,
+            self._database_path,
+            as_of or datetime.now(UTC),
+        )
 
     async def load_scene_embeddings(
         self,
@@ -45,6 +60,23 @@ class DuckDBMetricStore:
         await asyncio.to_thread(_replace, self._database_path, batch)
         return len(batch.genre_weeks), len(batch.ecosystem_weeks)
 
+    async def replace_corrected(
+        self,
+        batch: MetricsBatch,
+        evidence: MetricEvidence,
+        derivation_version: str = LASTFM_WINDOW_DERIVATION_VERSION,
+    ) -> tuple[int, int]:
+        """Validate and activate a versioned correction without rewriting v1."""
+
+        await asyncio.to_thread(
+            _replace_corrected,
+            self._database_path,
+            batch,
+            evidence,
+            derivation_version,
+        )
+        return len(batch.genre_weeks), len(batch.ecosystem_weeks)
+
 
 def _initialize(database_path: Path) -> None:
     database_path.parent.mkdir(parents=True, exist_ok=True)
@@ -56,26 +88,38 @@ def _initialize(database_path: Path) -> None:
             "create_raw_mb_release_groups.sql",
             "create_stg_post_artist_resolution.sql",
             "create_stg_genre_resolution.sql",
+            "create_stg_collection_checkpoints.sql",
             "create_mart_metrics.sql",
+            "create_mart_metrics_v2.sql",
             "create_mart_evidence.sql",
             "create_mart_bluesky_music_feed.sql",
             "create_mart_scene_map.sql",
             "create_mart_briefs.sql",
             "create_mart_pipeline_runs.sql",
+            "create_mart_metric_versions.sql",
+            "create_mart_axis_maturity.sql",
         ):
             connection.execute(load_sql(statement_name))
 
 
-def _load_evidence(database_path: Path) -> MetricEvidence:
+def _load_evidence(database_path: Path, as_of: datetime) -> MetricEvidence:
     with duckdb.connect(str(database_path), read_only=True) as connection:
         conversation_rows = connection.execute(
-            load_sql("select_metric_conversation_evidence.sql")
+            load_sql("select_metric_conversation_evidence.sql"),
+            [as_of],
         ).fetchall()
         listening_rows = connection.execute(
             load_sql("select_metric_listening_delta_candidates.sql")
         ).fetchall()
         supply_rows = connection.execute(
             load_sql("select_metric_supply_evidence.sql")
+        ).fetchall()
+        supply_window_rows = connection.execute(
+            load_sql("select_completed_musicbrainz_windows.sql")
+        ).fetchall()
+        post_maturity_rows = connection.execute(
+            load_sql("select_bluesky_engagement_maturity.sql"),
+            [as_of],
         ).fetchall()
     return MetricEvidence(
         conversation=tuple(
@@ -87,6 +131,8 @@ def _load_evidence(database_path: Path) -> MetricEvidence:
                 likes=row[4],
                 reposts=row[5],
                 replies=row[6],
+                engagement_fetched_at=row[7],
+                engagement_maturity_status=row[8],
             )
             for row in conversation_rows
         ),
@@ -96,10 +142,13 @@ def _load_evidence(database_path: Path) -> MetricEvidence:
                 canonical_genre=row[1],
                 artist_key=row[2],
                 artist_name=row[3],
-                playcount=row[4],
-                listeners=row[5],
-                previous_playcount=row[6],
-                previous_listeners=row[7],
+                artist_mbid=row[4],
+                playcount=row[5],
+                listeners=row[6],
+                previous_playcount=row[7],
+                previous_listeners=row[8],
+                previous_fetched_at=row[9],
+                fetched_at=row[10],
             )
             for row in listening_rows
         ),
@@ -110,6 +159,29 @@ def _load_evidence(database_path: Path) -> MetricEvidence:
                 release_group_mbid=row[2],
             )
             for row in supply_rows
+        ),
+        supply_windows=tuple(
+            SupplyCollectionWindow(
+                start_date=row[0],
+                end_date=row[1],
+                completed_at=row[2],
+            )
+            for row in supply_window_rows
+        ),
+        post_maturity=tuple(
+            PostEngagementMaturity(
+                post_uri=row[0],
+                created_at=row[1],
+                as_of=row[2],
+                has_24h_snapshot=row[3],
+                has_72h_snapshot=row[4],
+                latest_engagement_fetched_at=row[5],
+                like_count=row[6],
+                repost_count=row[7],
+                reply_count=row[8],
+                engagement_maturity_status=row[9],
+            )
+            for row in post_maturity_rows
         ),
     )
 
@@ -134,10 +206,19 @@ def _replace(database_path: Path, batch: MetricsBatch) -> None:
     genre_rows = [_genre_row(metric) for metric in batch.genre_weeks]
     ecosystem_rows = [_ecosystem_row(metric) for metric in batch.ecosystem_weeks]
     scene_map_rows = [_scene_map_row(point) for point in batch.scene_map_points]
+    maturity_rows = [_maturity_row(row) for row in batch.axis_maturity]
+    post_maturity_rows = [_post_maturity_row(row) for row in batch.post_maturity]
     with duckdb.connect(str(database_path)) as connection:
         connection.begin()
         try:
             connection.execute(load_sql("delete_mart_metrics.sql"))
+            connection.execute(
+                load_sql("delete_mart_axis_maturity.sql"),
+                ["v1", "v1"],
+            )
+            connection.execute(
+                load_sql("delete_mart_bluesky_engagement_maturity.sql")
+            )
             if genre_rows:
                 connection.executemany(
                     load_sql("insert_mart_genre_weekly.sql"),
@@ -153,9 +234,203 @@ def _replace(database_path: Path, batch: MetricsBatch) -> None:
                     load_sql("insert_mart_scene_map.sql"),
                     scene_map_rows,
                 )
+            if maturity_rows:
+                connection.executemany(
+                    load_sql("insert_mart_genre_week_axis_maturity.sql"),
+                    maturity_rows,
+                )
+            if post_maturity_rows:
+                connection.executemany(
+                    load_sql("insert_mart_bluesky_engagement_maturity.sql"),
+                    post_maturity_rows,
+                )
             connection.execute(load_sql("refresh_mart_evidence.sql"))
             connection.execute(
                 load_sql("refresh_mart_bluesky_music_feed.sql")
+            )
+            connection.commit()
+        except BaseException:
+            connection.rollback()
+            raise
+
+
+def _execute_statements(
+    connection: duckdb.DuckDBPyConnection,
+    statement_name: str,
+    parameters: list[object],
+) -> None:
+    statements = tuple(
+        statement.strip()
+        for statement in load_sql(statement_name).split(";")
+        if statement.strip()
+    )
+    for statement in statements:
+        connection.execute(statement, parameters)
+
+
+def _listening_window_row(
+    item: ListeningDeltaCandidate,
+    derivation_version: str,
+) -> tuple[object, ...]:
+    assert item.listening_window_status is not None
+    return (
+        "v1",
+        "v1",
+        derivation_version,
+        item.week_start,
+        item.canonical_genre,
+        None,
+        item.artist_key,
+        item.artist_name,
+        item.artist_mbid,
+        1.0,
+        item.playcount,
+        item.listeners,
+        item.previous_playcount,
+        item.previous_listeners,
+        item.previous_fetched_at,
+        item.fetched_at,
+        item.interval_days,
+        item.observations_append_only,
+        item.listening_window_status,
+        None,
+        None,
+    )
+
+
+def _maturity_row(row: GenreWeekAxisMaturity) -> tuple[object, ...]:
+    return (
+        row.artifact_family,
+        row.taxonomy_version,
+        row.week_start,
+        row.genre_id,
+        row.conversation_maturity,
+        row.listening_maturity,
+        row.supply_maturity,
+        row.decision_ready,
+        row.conversation_post_count,
+        row.mature_conversation_post_count,
+        row.valid_listening_artist_count,
+        row.supply_release_group_count,
+        row.computed_at,
+    )
+
+
+def _post_maturity_row(row: PostEngagementMaturity) -> tuple[object, ...]:
+    return (
+        row.post_uri,
+        row.created_at,
+        row.as_of,
+        row.has_24h_snapshot,
+        row.has_72h_snapshot,
+        row.latest_engagement_fetched_at,
+        row.like_count,
+        row.repost_count,
+        row.reply_count,
+        row.engagement_maturity_status,
+    )
+
+
+def _replace_corrected(
+    database_path: Path,
+    batch: MetricsBatch,
+    evidence: MetricEvidence,
+    derivation_version: str,
+) -> None:
+    if not derivation_version:
+        raise ValueError("derivation_version must be non-empty")
+    genre_rows = [
+        (derivation_version, *_genre_row(metric))
+        for metric in batch.genre_weeks
+    ]
+    ecosystem_rows = [
+        (derivation_version, *_ecosystem_row(metric))
+        for metric in batch.ecosystem_weeks
+    ]
+    window_rows = [
+        _listening_window_row(item, derivation_version)
+        for item in evidence.listening_candidates
+    ]
+    maturity_rows = [_maturity_row(row) for row in batch.axis_maturity]
+    post_maturity_rows = [_post_maturity_row(row) for row in batch.post_maturity]
+    validated_at = max(
+        (
+            *(row.computed_at for row in batch.genre_weeks),
+            *(row.computed_at for row in batch.ecosystem_weeks),
+        ),
+        default=datetime.now(UTC),
+    )
+    with duckdb.connect(str(database_path)) as connection:
+        connection.begin()
+        try:
+            _execute_statements(
+                connection,
+                "delete_mart_metric_version_v1.sql",
+                [derivation_version],
+            )
+            connection.execute(
+                load_sql("delete_mart_axis_maturity.sql"),
+                ["v1", "v1"],
+            )
+            connection.execute(
+                load_sql("delete_mart_bluesky_engagement_maturity.sql")
+            )
+            if genre_rows:
+                connection.executemany(
+                    load_sql("insert_mart_genre_weekly_versioned.sql"),
+                    genre_rows,
+                )
+            if ecosystem_rows:
+                connection.executemany(
+                    load_sql("insert_mart_ecosystem_weekly_versioned.sql"),
+                    ecosystem_rows,
+                )
+            if window_rows:
+                connection.executemany(
+                    load_sql("insert_mart_lastfm_listening_window.sql"),
+                    window_rows,
+                )
+            if maturity_rows:
+                connection.executemany(
+                    load_sql("insert_mart_genre_week_axis_maturity.sql"),
+                    maturity_rows,
+                )
+            if post_maturity_rows:
+                connection.executemany(
+                    load_sql("insert_mart_bluesky_engagement_maturity.sql"),
+                    post_maturity_rows,
+                )
+            connection.execute(
+                load_sql("insert_mart_metric_withdrawals_v1.sql"),
+                [derivation_version, derivation_version],
+            )
+            failures = connection.execute(
+                load_sql("validate_mart_metric_version_v1.sql"),
+                [derivation_version, derivation_version],
+            ).fetchone()
+            if failures is None or failures[0] != 0:
+                raise ValueError(
+                    f"corrected v1 artifact failed {failures[0] if failures else '?'} validations"
+                )
+            withdrawal_count = connection.execute(
+                load_sql("count_mart_metric_withdrawals.sql"),
+                ["v1", "v1", derivation_version],
+            ).fetchone()
+            assert withdrawal_count is not None
+            activation = load_sql("activate_mart_metric_version.sql").split(";")
+            connection.execute(
+                activation[0],
+                ["v1", "v1"],
+            )
+            connection.execute(
+                activation[1],
+                [
+                    "v1",
+                    "v1",
+                    derivation_version,
+                    validated_at,
+                    withdrawal_count[0],
+                ],
             )
             connection.commit()
         except BaseException:

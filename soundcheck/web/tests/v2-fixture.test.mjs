@@ -108,6 +108,8 @@ test("Last.fm receipts are consecutive nonnegative snapshot deltas", () => {
       assert.ok(item.playcount_delta >= 0);
       assert.ok(item.listeners_delta >= 0);
       assert.ok(item.previous_fetched_at < item.fetched_at);
+      assert.equal(item.interval_days, 7);
+      assert.equal(item.listening_window_status, "valid_weekly");
     }
   }
   assert.ok(observed > 0);

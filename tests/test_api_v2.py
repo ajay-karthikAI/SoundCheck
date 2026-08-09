@@ -277,7 +277,7 @@ def test_next_up_ecosystem_briefs_scene_and_coverage(
 
     scene = api_v2_client.get("/api/v2/scene-map").json()
     assert scene["items"][0]["genre"]["genre_id"] == "genre_garage_rock"
-    assert scene["items"][0]["opportunity"]["value"] == 1.0
+    assert scene["items"][0]["opportunity"]["value"] == 1.1
 
     coverage = api_v2_client.get(
         "/api/v2/coverage",
@@ -553,6 +553,8 @@ def _metrics_batch(taxonomy: GenreTaxonomy) -> MetricsV2Batch:
                 listeners_delta=20,
                 fetched_at=NOW,
                 previous_fetched_at=NOW - timedelta(weeks=1),
+                interval_days=7.0,
+                listening_window_status="valid_weekly",
                 membership_weight=1.0,
                 membership_method="exact_alias",
                 membership_confidence=0.99,

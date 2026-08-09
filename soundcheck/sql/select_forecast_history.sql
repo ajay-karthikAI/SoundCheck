@@ -20,7 +20,7 @@ SELECT
     metric.opportunity_ci_high,
     metric.breakout_precursor,
     coalesce(embedding.embedding, []::FLOAT[]) AS genre_embedding
-FROM mart_.genre_weekly AS metric
+FROM mart_.genre_weekly_production AS metric
 LEFT JOIN stg_.canonical_genre_embeddings AS embedding
     ON embedding.canonical_genre = metric.canonical_genre
 ORDER BY metric.week_start, metric.canonical_genre;

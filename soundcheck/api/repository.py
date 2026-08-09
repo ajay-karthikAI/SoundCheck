@@ -167,7 +167,7 @@ class DuckDBReadRepository:
         )
         artist_rows = self._all(
             "api_listening_evidence.sql",
-            (genre, week, limit),
+            (genre, week, genre, week, limit),
         )
         release_rows = self._all(
             "api_supply_evidence.sql",
@@ -199,7 +199,10 @@ class DuckDBReadRepository:
                     artist_mbid=row[2],
                     playcount_delta=row[3],
                     listeners_delta=row[4],
-                    fetched_at=row[5],
+                    previous_fetched_at=row[5],
+                    fetched_at=row[6],
+                    interval_days=row[7],
+                    listening_window_status=row[8],
                 )
                 for row in artist_rows
             ),

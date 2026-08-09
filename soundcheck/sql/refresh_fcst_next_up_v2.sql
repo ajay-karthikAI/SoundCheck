@@ -58,8 +58,8 @@ WITH current_metrics AS (
             WHEN 'global' THEN base.breakout_global
             ELSE base.breakout_peer_family
         END AS breakout
-    FROM mart_.genre_weekly_v2 AS base
-    JOIN mart_.metric_estimates_v2 AS estimate
+    FROM mart_.genre_weekly_v2_production AS base
+    JOIN mart_.metric_estimates_v2_production AS estimate
         ON estimate.taxonomy_version = base.taxonomy_version
         AND estimate.week_start = base.week_start
         AND estimate.scope_type = 'genre'

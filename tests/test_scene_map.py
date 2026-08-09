@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import math
-from datetime import UTC, date, datetime
+from datetime import UTC, date, datetime, timedelta
 
 import pytest
 
+from soundcheck.metrics.maturity import SupplyCollectionWindow
 from soundcheck.metrics.models import (
     CanonicalGenreEmbedding,
     ConversationEvidence,
@@ -43,10 +44,19 @@ def test_scene_map_is_deterministic_and_carries_metric_uncertainty() -> None:
                 listeners=110 + index,
                 previous_playcount=1_000,
                 previous_listeners=100,
+                previous_fetched_at=datetime(2026, 7, 9, 12, tzinfo=UTC),
+                fetched_at=datetime(2026, 7, 16, 12, tzinfo=UTC),
             )
             for index, genre in enumerate(genres)
         ),
         supply=(),
+        supply_windows=(
+            SupplyCollectionWindow(
+                start_date=week,
+                end_date=week + timedelta(days=6),
+                completed_at=datetime(2026, 7, 20, tzinfo=UTC),
+            ),
+        ),
     )
     batch = build_metrics(
         evidence,

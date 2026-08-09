@@ -22,13 +22,34 @@ genre-week. Cross-genre totals therefore describe overlapping scenes rather
 than a mutually exclusive taxonomy.
 
 Conversation posts use the preferred staged artist link: MBID joins take
-precedence over name joins. Engagement uses the latest available AppView poll
-for the post, which is intended to be the approximately 72-hour observation.
-Missing engagement is zero while the resolved post itself still contributes
-one mention.
+precedence over name joins. Engagement uses the latest append-only AppView
+72-hour target poll for the post. A post without that mature observation has
+null engagement, is labeled pending or overdue, and does not enter a decision
+score; missing engagement is never converted to zero.
 
 MusicBrainz release groups require a complete `YYYY-MM-DD` first-release date.
-Partial dates cannot be assigned to an ISO week honestly and are excluded.
+The date must also parse as a real calendar date. Partial or invalid dates
+cannot be assigned to an ISO week honestly and are excluded.
+
+## Operational axis maturity
+
+The batch publishes post-level engagement maturity in
+`mart_.bluesky_engagement_maturity` and genre-week maturity in
+`mart_.genre_week_axis_maturity`. Each genre-week carries:
+
+- `conversation_pending` until every attributed post has a 72-hour target
+  observation, otherwise `complete`;
+- `listening_pending` until at least one artist has a valid consecutive-ISO-
+  week cumulative delta, otherwise `complete`; and
+- `supply_pending` until a completed MusicBrainz collection window covers the
+  entire closed Monday-through-Sunday release-date interval, otherwise
+  `complete`.
+
+`decision_ready` is true only when all three fields are `complete`. Opportunity,
+discovery-gap, and all ranked decision estimates are null otherwise. The open
+current ISO week is always `supply_pending`; its partial evidence is
+observational only. A completed closed window with no matching release groups
+is the only condition under which zero weekly supply is meaningful.
 
 ## Axis definitions
 
@@ -95,7 +116,9 @@ Multiple observations for the same identity in one ISO week—including
 same-week retries and duplicate identities returned by Last.fm
 autocorrection—are collapsed to the latest observation before ordering. This
 prevents an accidental re-poll minutes later from masquerading as weekly
-growth. For a current weekly snapshot \(j\),
+growth. The retained current and previous snapshots are then audited with
+`previous_fetched_at`, `fetched_at`, exact elapsed `interval_days`, and
+`listening_window_status`. For a current weekly snapshot \(j\),
 
 \[
 \Delta P_j = P_j - P_{j-1},
@@ -103,11 +126,17 @@ growth. For a current weekly snapshot \(j\),
 \Delta U_j = U_j - U_{j-1}.
 \]
 
-The delta is attributed to the ISO week containing the current snapshot.
-The first observation has no predecessor and is excluded. If either counter
-decreases, the interval is treated as a source correction and excluded rather
-than clipped or zero-filled. Multiple valid intervals for the same artist and
-week are summed before artists are used as bootstrap evidence units.
+The delta is attributed to the ISO week containing the current snapshot only
+when both rows are append-only observations, the prior snapshot belongs to the
+immediately preceding ISO week, the current timestamp is later, and neither
+counter decreases. Only `listening_window_status = valid_weekly` enters a
+listening metric. First observations, same-week retries, incomplete pairs,
+nonconsecutive or missing-week pairs, invalid timestamp order, and counter
+corrections remain explicit audit rows and are excluded rather than clipped or
+zero-filled. `interval_days` is descriptive metadata only: an 11-day delta is
+never divided into synthetic daily or weekly values. Multiple valid intervals
+for the same artist and week are summed before artists are used as bootstrap
+evidence units.
 
 Consequences:
 
@@ -115,6 +144,18 @@ Consequences:
 - lifetime totals are never interpreted as weekly activity;
 - a genre with no valid consecutive artist observations has `NULL` listening,
   opportunity, discovery gap, listening health, and listening trend values.
+
+Corrected rows are written to derivation-versioned marts alongside the legacy
+v1 artifacts. `mart_.lastfm_listening_windows` is the pair-level audit, and a
+validated active derivation is exposed through the `*_production` views. A
+version is activated only after batch validation proves that opportunity and
+discovery-gap rows cannot exist without a `valid_weekly` receipt. Legacy rows
+are retained unchanged for withdrawal comparison.
+
+Ranked decision surfaces default to the latest complete ISO week strictly
+before the current UTC ISO week. Current partial-week source evidence may be
+inspected as observational evidence, but it is not an opportunity or
+discovery-gap ranking.
 
 ## Empirical Bayes: conversation share
 

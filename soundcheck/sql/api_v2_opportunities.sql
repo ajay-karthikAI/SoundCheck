@@ -59,7 +59,7 @@ WITH estimates AS (
         bool_or(spike) FILTER (
             WHERE metric_name = 'supply'
         ) AS supply_spike
-    FROM mart_.metric_estimates_v2
+    FROM mart_.metric_estimates_v2_production
     WHERE
         taxonomy_version = ?
         AND week_start = ?
@@ -100,7 +100,7 @@ SELECT
         WHEN 'global' THEN base.breakout_global
         ELSE base.breakout_peer_family
     END AS breakout
-FROM mart_.genre_weekly_v2 AS base
+FROM mart_.genre_weekly_v2_production AS base
 LEFT JOIN estimates AS estimate
     ON estimate.taxonomy_version = base.taxonomy_version
     AND estimate.week_start = base.week_start
@@ -108,6 +108,7 @@ LEFT JOIN estimates AS estimate
 WHERE
     base.taxonomy_version = ?
     AND base.week_start = ?
+    AND base.week_start < CAST(date_trunc('week', current_timestamp) AS DATE)
     AND (? IS NULL OR base.macro_family_id = ?)
     AND (? IS NULL OR base.parent_genre_id = ?)
     AND (? IS NULL OR base.coverage_state = ?)

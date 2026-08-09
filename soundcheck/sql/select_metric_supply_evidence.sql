@@ -32,10 +32,11 @@ release_genres AS (
     WHERE
         source.raw_tag <> ''
         AND regexp_full_match(source.first_release_date, '[0-9]{4}-[0-9]{2}-[0-9]{2}')
+        AND try_cast(source.first_release_date AS DATE) IS NOT NULL
 )
 SELECT
     CAST(
-        date_trunc('week', CAST(first_release_date AS DATE))
+        date_trunc('week', try_cast(first_release_date AS DATE))
         AS DATE
     ) AS week_start,
     canonical_genre,

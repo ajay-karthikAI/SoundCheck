@@ -8,6 +8,17 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from soundcheck.metrics.coverage import EligibilityState, GenreCoverageRow
+from soundcheck.metrics.listening_windows import (
+    ListeningWindowStatus,
+    classify_listening_window,
+    interval_days,
+    iso_week_start,
+)
+from soundcheck.metrics.maturity import (
+    GenreWeekAxisMaturity,
+    PostEngagementMaturityStatus,
+    SupplyCollectionWindow,
+)
 
 MetricContext = Literal["global", "peer_family"]
 MetricName = Literal[
@@ -27,6 +38,9 @@ EstimateStatus = Literal[
     "insufficient_resolution",
     "unsupported",
     "evidence_mismatch",
+    "conversation_pending",
+    "listening_pending",
+    "supply_pending",
 ]
 
 
@@ -46,9 +60,9 @@ class ConversationEvidenceV2(BaseModel):
     macro_family_id: str
     post_uri: str
     membership_weight: float = Field(gt=0.0, le=1.0)
-    likes: int = Field(ge=0)
-    reposts: int = Field(ge=0)
-    replies: int = Field(ge=0)
+    likes: int | None = Field(default=None, ge=0)
+    reposts: int | None = Field(default=None, ge=0)
+    replies: int | None = Field(default=None, ge=0)
     did: str | None = None
     created_at: datetime | None = None
     text: str | None = None
@@ -58,9 +72,30 @@ class ConversationEvidenceV2(BaseModel):
     join_key_type: str | None = None
     membership_method: str | None = None
     membership_confidence: float | None = Field(default=None, ge=0.0, le=1.0)
+    engagement_fetched_at: datetime | None = None
+    engagement_maturity_status: PostEngagementMaturityStatus = "complete"
+
+    _engagement_fetched_at_utc = field_validator("engagement_fetched_at")(
+        lambda value: None if value is None else _as_utc(value)
+    )
+
+    @model_validator(mode="after")
+    def validate_engagement_missingness(self) -> ConversationEvidenceV2:
+        counts = (self.likes, self.reposts, self.replies)
+        if self.engagement_maturity_status == "complete":
+            if any(value is None for value in counts):
+                raise ValueError("complete engagement requires non-null counts")
+        elif any(value is not None for value in counts):
+            raise ValueError("pending engagement counts must remain null")
+        return self
 
     @property
     def weighted_score(self) -> float:
+        if self.engagement_maturity_status != "complete":
+            raise ValueError("pending engagement cannot enter a conversation score")
+        assert self.likes is not None
+        assert self.reposts is not None
+        assert self.replies is not None
         return self.membership_weight * (
             1.0 + 0.5 * self.likes + 1.5 * self.reposts + self.replies
         )
@@ -82,10 +117,43 @@ class ListeningCandidateV2(BaseModel):
     previous_listeners: int | None = Field(default=None, ge=0)
     artist_name: str | None = None
     artist_mbid: str | None = None
-    fetched_at: datetime | None = None
+    fetched_at: datetime
     previous_fetched_at: datetime | None = None
+    interval_days: float | None = None
+    observations_append_only: bool = True
+    listening_window_status: ListeningWindowStatus | None = None
     membership_method: str | None = None
     membership_confidence: float | None = Field(default=None, ge=0.0, le=1.0)
+
+    _fetched_at_utc = field_validator("fetched_at")(_as_utc)
+    _previous_fetched_at_utc = field_validator("previous_fetched_at")(
+        lambda value: None if value is None else _as_utc(value)
+    )
+
+    @model_validator(mode="after")
+    def validate_window_metadata(self) -> ListeningCandidateV2:
+        if self.week_start != iso_week_start(self.fetched_at):
+            raise ValueError("week_start must match fetched_at's ISO week")
+        expected_days = interval_days(self.previous_fetched_at, self.fetched_at)
+        expected_status = classify_listening_window(
+            previous_fetched_at=self.previous_fetched_at,
+            fetched_at=self.fetched_at,
+            previous_playcount=self.previous_playcount,
+            playcount=self.playcount,
+            previous_listeners=self.previous_listeners,
+            listeners=self.listeners,
+            observations_append_only=self.observations_append_only,
+        )
+        if self.interval_days is not None and self.interval_days != expected_days:
+            raise ValueError("interval_days must equal the exact snapshot interval")
+        if (
+            self.listening_window_status is not None
+            and self.listening_window_status != expected_status
+        ):
+            raise ValueError("listening_window_status does not match snapshot metadata")
+        object.__setattr__(self, "interval_days", expected_days)
+        object.__setattr__(self, "listening_window_status", expected_status)
+        return self
 
 
 class SupplyEvidenceV2(BaseModel):
@@ -153,6 +221,8 @@ class ListeningReceiptV2(BaseModel):
     listeners_delta: int = Field(ge=0)
     fetched_at: datetime
     previous_fetched_at: datetime
+    interval_days: float = Field(gt=0.0)
+    listening_window_status: Literal["valid_weekly"] = "valid_weekly"
     membership_weight: float = Field(gt=0.0, le=1.0)
     membership_method: str
     membership_confidence: float = Field(ge=0.0, le=1.0)
@@ -192,6 +262,7 @@ class MetricEvidenceV2(BaseModel):
     listening_candidates: tuple[ListeningCandidateV2, ...] = ()
     supply: tuple[SupplyEvidenceV2, ...] = ()
     coverage: tuple[GenreCoverageRow, ...] = ()
+    supply_windows: tuple[SupplyCollectionWindow, ...] = ()
 
 
 class GenreWeekV2(BaseModel):
@@ -452,6 +523,7 @@ class MetricsV2Batch(BaseModel):
     conversation_evidence: tuple[ConversationReceiptV2, ...] = ()
     listening_evidence: tuple[ListeningReceiptV2, ...] = ()
     supply_evidence: tuple[SupplyReceiptV2, ...] = ()
+    axis_maturity: tuple[GenreWeekAxisMaturity, ...] = ()
 
     @model_validator(mode="after")
     def validate_version_isolation(self) -> MetricsV2Batch:
@@ -463,6 +535,7 @@ class MetricsV2Batch(BaseModel):
             *(row.taxonomy_version for row in self.conversation_evidence),
             *(row.taxonomy_version for row in self.listening_evidence),
             *(row.taxonomy_version for row in self.supply_evidence),
+            *(row.taxonomy_version for row in self.axis_maturity),
         )
         if any(version != self.taxonomy_version for version in versions):
             raise ValueError("every v2 mart row must match the batch taxonomy version")

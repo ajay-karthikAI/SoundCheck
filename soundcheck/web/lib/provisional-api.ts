@@ -40,10 +40,9 @@ const API_BASE_URL =
   process.env.SOUNDCHECK_API_URL ?? "http://127.0.0.1:8000";
 
 /**
- * Surface the newest observed v1 metrics while taxonomy-v2 eligibility is
- * still collecting history. These are real week-over-week Last.fm deltas,
- * never lifetime totals, and remain explicitly labelled provisional in the
- * UI. This adapter does not relax or mutate any v2 coverage state.
+ * Surface the latest complete, eligible v1 week while taxonomy-v2 eligibility
+ * is still collecting history. Current partial weeks remain observational and
+ * never enter this ranked adapter.
  */
 export async function getProvisionalObservedOpportunities(
   scope: ScopeSelection,
@@ -53,7 +52,7 @@ export async function getProvisionalObservedOpportunities(
 
   const health = await getObservedFreshness();
   if (!health.ok) return health;
-  const week = scope.week ?? health.data.latest_metric_week;
+  const week = scope.week ?? health.data.latest_complete_week;
   if (!week) return emptyOpportunityPage();
 
   const [rows, taxonomy] = await Promise.all([

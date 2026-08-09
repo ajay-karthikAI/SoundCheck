@@ -4,12 +4,12 @@ from __future__ import annotations
 
 import asyncio
 import json
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from pathlib import Path
 from typing import Literal
 
 import duckdb
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from soundcheck.sql.loader import load_sql
 
@@ -25,10 +25,24 @@ class CollectionRunMetadata(BaseModel):
     shard_count: int = Field(ge=1)
     snapshot_at: datetime
     plan_fingerprint: str = Field(min_length=64, max_length=64)
+    window_start: date | None = None
+    window_end: date | None = None
 
     _snapshot_at_utc = field_validator("snapshot_at")(
         lambda value: value.astimezone(UTC)
     )
+
+    @model_validator(mode="after")
+    def validate_window(self) -> CollectionRunMetadata:
+        if (self.window_start is None) != (self.window_end is None):
+            raise ValueError("collection windows require both start and end")
+        if (
+            self.window_start is not None
+            and self.window_end is not None
+            and self.window_start > self.window_end
+        ):
+            raise ValueError("window_start must not be after window_end")
+        return self
 
 
 class CheckpointRecord(BaseModel):

@@ -45,6 +45,8 @@ def _initialize(database_path: Path) -> None:
     with duckdb.connect(str(database_path)) as connection:
         connection.execute(load_sql("create_stg_genre_resolution.sql"))
         connection.execute(load_sql("create_mart_metrics.sql"))
+        connection.execute(load_sql("create_mart_metrics_v2.sql"))
+        connection.execute(load_sql("create_mart_metric_versions.sql"))
         connection.execute(load_sql("create_fcst_tables.sql"))
 
 

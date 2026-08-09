@@ -261,6 +261,17 @@ class DuckDBV2Repository:
                 )
             )
         if source == "listening":
+            listening_parameters = (
+                taxonomy_version,
+                taxonomy_version,
+                genre_id,
+                week,
+                taxonomy_version,
+                genre_id,
+                week,
+                limit,
+                offset,
+            )
             return tuple(
                 ListeningReceiptV2(
                     artist_key=row[0],
@@ -274,13 +285,15 @@ class DuckDBV2Repository:
                     listeners_delta=row[8],
                     fetched_at=row[9],
                     previous_fetched_at=row[10],
-                    membership_weight=row[11],
-                    membership_method=row[12],
-                    membership_confidence=row[13],
+                    interval_days=row[11],
+                    listening_window_status=row[12],
+                    membership_weight=row[13],
+                    membership_method=row[14],
+                    membership_confidence=row[15],
                 )
                 for row in self._all(
                     "api_v2_listening_evidence.sql",
-                    parameters,
+                    listening_parameters,
                 )
             )
         return tuple(
@@ -486,8 +499,12 @@ class DuckDBV2Repository:
             "api_v2_scene_map.sql",
             (
                 taxonomy_version,
+                context,
+                taxonomy_version,
                 week,
                 context,
+                taxonomy_version,
+                week,
                 macro_family_id,
                 macro_family_id,
                 parent_genre_id,

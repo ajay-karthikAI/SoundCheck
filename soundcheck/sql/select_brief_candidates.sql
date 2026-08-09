@@ -4,7 +4,7 @@ WITH ranked_opportunities AS (
         ntile(10) OVER (
             ORDER BY metric.opportunity DESC, metric.canonical_genre
         ) AS opportunity_decile
-    FROM mart_.genre_weekly AS metric
+    FROM mart_.genre_weekly_production AS metric
     WHERE
         metric.week_start = ?
         AND metric.opportunity IS NOT NULL
@@ -17,7 +17,7 @@ supply_history AS (
         max(history.supply_release_groups) AS release_range_high,
         count(history.week_start) AS history_weeks
     FROM ranked_opportunities AS current_metric
-    INNER JOIN mart_.genre_weekly AS history
+    INNER JOIN mart_.genre_weekly_production AS history
         ON
             history.canonical_genre = current_metric.canonical_genre
             AND history.week_start < current_metric.week_start

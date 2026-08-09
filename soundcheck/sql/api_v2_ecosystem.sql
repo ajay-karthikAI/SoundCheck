@@ -1,8 +1,10 @@
 WITH recent AS (
     SELECT *
-    FROM mart_.ecosystem_weekly_v2
+    FROM mart_.ecosystem_weekly_v2_production
     WHERE
         taxonomy_version = ?
+        AND week_start < CAST(date_trunc('week', current_timestamp) AS DATE)
+        AND estimate_status = 'ready'
         AND (
             (? = 'global' AND scope_type = 'global')
             OR (

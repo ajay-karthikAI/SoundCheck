@@ -133,11 +133,16 @@ def _insert_engagement(
             snapshot.repost_count,
             snapshot.reply_count,
             snapshot.fetched_at,
+            snapshot.poll_target_hours,
+            snapshot.poll_status,
         )
         for snapshot in snapshots
     ]
     with duckdb.connect(str(database_path)) as connection:
-        connection.executemany(load_sql("insert_raw_bluesky_engagement.sql"), rows)
+        connection.executemany(
+            load_sql("insert_raw_bluesky_engagement_poll.sql"),
+            rows,
+        )
 
 
 def _latest_cursor(database_path: Path) -> int | None:

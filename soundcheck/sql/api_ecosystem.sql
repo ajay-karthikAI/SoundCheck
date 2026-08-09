@@ -20,7 +20,10 @@ WITH recent AS (
         canonical_genre_count,
         listening_observed_genres,
         opportunity_observed_genres
-    FROM mart_.ecosystem_weekly
+    FROM mart_.ecosystem_weekly_production
+    WHERE
+        week_start < CAST(date_trunc('week', current_timestamp) AS DATE)
+        AND listening_observed_genres > 0
     ORDER BY week_start DESC
     LIMIT ?
 )

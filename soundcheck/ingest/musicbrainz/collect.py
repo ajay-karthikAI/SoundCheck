@@ -13,7 +13,7 @@ import asyncio
 import hashlib
 import json
 from collections.abc import Sequence
-from datetime import UTC, date, datetime, timedelta
+from datetime import UTC, date, datetime
 from pathlib import Path
 from typing import Literal
 
@@ -42,6 +42,7 @@ from soundcheck.ingest.musicbrainz.resumable import (
     finalize_musicbrainz_run,
 )
 from soundcheck.ingest.musicbrainz.storage import MusicBrainzReleaseGroupWriter
+from soundcheck.ingest.musicbrainz.windows import incremental_window as incremental_window
 from soundcheck.ingest.scaling import (
     DEFAULT_SCALING_CONFIG_PATH,
     load_scaling_config,
@@ -95,11 +96,6 @@ class MusicBrainzCollectionResult(BaseModel):
     shard_count: int
     shard_index: int | None
     release_groups_seen: int
-
-
-def incremental_window(as_of: date) -> tuple[date, date]:
-    """Return the inclusive trailing 14-day window ending at ``as_of``."""
-    return as_of - timedelta(days=13), as_of
 
 
 def build_release_group_query(
@@ -299,6 +295,8 @@ async def async_main(
         shard_count=settings.shard_count,
         snapshot_at=snapshot_at,
         plan_fingerprint=fingerprint,
+        window_start=settings.start_date,
+        window_end=settings.end_date,
     )
     await checkpoints.ensure_run("musicbrainz", settings.run_key, metadata)
     cache = DiskJsonCache(

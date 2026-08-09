@@ -1,7 +1,7 @@
 """Validated Bluesky and DuckDB boundary models."""
 
 from datetime import UTC, datetime
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -104,5 +104,17 @@ class EngagementSnapshot(BaseModel):
     repost_count: int = Field(ge=0)
     reply_count: int = Field(ge=0)
     fetched_at: datetime
+    poll_target_hours: Literal[24, 72] | None = None
+    poll_status: Literal["scheduled", "overdue_recovery", "ad_hoc"] = "ad_hoc"
 
     _fetched_at_utc = field_validator("fetched_at")(_as_utc)
+
+
+class EngagementPollTask(BaseModel):
+    """One scheduled or overdue maturity poll that remains append-only."""
+
+    model_config = ConfigDict(frozen=True)
+
+    uri: str
+    poll_target_hours: Literal[24, 72]
+    poll_status: Literal["scheduled", "overdue_recovery"]

@@ -75,6 +75,13 @@ formed; it does not use the cumulative totals as a weekly signal.
 reported week with a mapped Last.fm tag or artist observation. It identifies a
 collector that is still accumulating the minimum history.
 
+The same pair classifier is used by coverage and both metric generations.
+Each metrics derivation materializes the full audit in
+`mart_.lastfm_listening_windows`, including `previous_fetched_at`,
+`fetched_at`, exact `interval_days`, and `listening_window_status`. Coverage
+counts only `valid_weekly`; it never treats elapsed days as an exposure or
+rescales a longer interval.
+
 ### MusicBrainz release supply
 
 `musicbrainz_release_group_count` is the number of distinct release-group

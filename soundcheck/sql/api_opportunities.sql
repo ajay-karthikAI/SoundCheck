@@ -24,9 +24,10 @@ SELECT
     listening_spike,
     supply_spike,
     breakout_precursor
-FROM mart_.genre_weekly
+FROM mart_.genre_weekly_production
 WHERE
     week_start = ?
+    AND week_start < CAST(date_trunc('week', current_timestamp) AS DATE)
     AND opportunity IS NOT NULL
 ORDER BY opportunity DESC, canonical_genre
 LIMIT ?;

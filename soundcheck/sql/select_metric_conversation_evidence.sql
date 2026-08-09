@@ -1,6 +1,9 @@
 SET TimeZone = 'UTC';
 
-WITH latest_posts AS (
+WITH settings AS (
+    SELECT CAST(? AS TIMESTAMPTZ) AS as_of
+),
+latest_posts AS (
     SELECT
         uri,
         created_at,
@@ -23,16 +26,28 @@ preferred_links AS (
             score DESC
     ) = 1
 ),
-latest_engagement AS (
+final_engagement AS (
     SELECT
-        uri,
-        like_count,
-        repost_count,
-        reply_count
-    FROM raw_.bluesky_engagement
+        post.uri,
+        engagement.like_count,
+        engagement.repost_count,
+        engagement.reply_count,
+        engagement.fetched_at
+    FROM latest_posts AS post
+    JOIN raw_.bluesky_engagement AS engagement
+        ON engagement.uri = post.uri
+    WHERE
+        post.recency_rank = 1
+        AND (
+            engagement.poll_target_hours = 72
+            OR (
+                engagement.poll_target_hours IS NULL
+                AND engagement.fetched_at >= post.created_at + INTERVAL 60 HOUR
+            )
+        )
     QUALIFY row_number() OVER (
-        PARTITION BY uri
-        ORDER BY fetched_at DESC
+        PARTITION BY post.uri
+        ORDER BY engagement.fetched_at DESC
     ) = 1
 ),
 lastfm_artist_base AS (
@@ -152,10 +167,17 @@ SELECT
     post.canonical_genre,
     post.uri AS post_uri,
     1 AS mentions,
-    coalesce(engagement.like_count, 0) AS likes,
-    coalesce(engagement.repost_count, 0) AS reposts,
-    coalesce(engagement.reply_count, 0) AS replies
+    engagement.like_count AS likes,
+    engagement.repost_count AS reposts,
+    engagement.reply_count AS replies,
+    engagement.fetched_at AS engagement_fetched_at,
+    CASE
+        WHEN engagement.uri IS NOT NULL THEN 'complete'
+        WHEN settings.as_of < post.week_start + INTERVAL 7 DAY THEN 'awaiting_72h'
+        ELSE 'overdue_72h'
+    END AS engagement_maturity_status
 FROM post_genres AS post
-LEFT JOIN latest_engagement AS engagement
+CROSS JOIN settings
+LEFT JOIN final_engagement AS engagement
     ON engagement.uri = post.uri
 ORDER BY post.week_start, post.canonical_genre, post.uri;

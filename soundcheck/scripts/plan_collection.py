@@ -88,7 +88,9 @@ def main() -> None:
     if args.format == "json":
         print(json.dumps(plan.model_dump(mode="json"), sort_keys=True))
     elif args.format == "github":
+        iso = args.as_of.isocalendar()
         print(f"lastfm_shard_count={plan.lastfm.shard_count}")
+        print(f"lastfm_run_key=lastfm-{iso.year}-W{iso.week:02d}")
         print(f"musicbrainz_shard_count={plan.musicbrainz.shard_count}")
     else:
         print(render_table(plan))

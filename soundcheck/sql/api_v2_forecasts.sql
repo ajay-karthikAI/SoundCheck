@@ -4,7 +4,7 @@ WITH latest_genres AS (
         genre_id,
         parent_genre_id,
         coverage_state
-    FROM mart_.genre_weekly_v2
+    FROM mart_.genre_weekly_v2_production
     WHERE taxonomy_version = ?
     QUALIFY row_number() OVER (
         PARTITION BY taxonomy_version, genre_id

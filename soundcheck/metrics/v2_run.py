@@ -6,7 +6,7 @@ import argparse
 import asyncio
 import json
 from collections import Counter
-from datetime import UTC, date, datetime
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 from typing import Literal
 
@@ -97,6 +97,45 @@ class MetricsV2Completion(BaseModel):
     bootstrap_resamples: int
 
 
+class AxisOperationalSummaryV2(BaseModel):
+    """Version-isolated axis receipts and first complete week."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    event: Literal["axis_operational_summary_v2"] = "axis_operational_summary_v2"
+    taxonomy_version: str
+    source_counts: dict[str, int]
+    maturity_states: dict[str, int]
+    first_eligible_complete_week: date | None
+
+
+def _axis_summary(batch: MetricsV2Batch) -> AxisOperationalSummaryV2:
+    states: Counter[str] = Counter()
+    for row in batch.axis_maturity:
+        states[row.conversation_maturity] += 1
+        states[row.listening_maturity] += 1
+        states[row.supply_maturity] += 1
+    complete_weeks = {
+        row.week_start for row in batch.axis_maturity if row.decision_ready
+    }
+    return AxisOperationalSummaryV2(
+        taxonomy_version=batch.taxonomy_version,
+        source_counts={
+            "bluesky_mature_post_genre_weeks": sum(
+                row.mature_conversation_post_count for row in batch.axis_maturity
+            ),
+            "lastfm_valid_artist_genre_weeks": sum(
+                row.valid_listening_artist_count for row in batch.axis_maturity
+            ),
+            "musicbrainz_release_genre_weeks": sum(
+                row.supply_release_group_count for row in batch.axis_maturity
+            ),
+        },
+        maturity_states=dict(sorted(states.items())),
+        first_eligible_complete_week=min(complete_weeks) if complete_weeks else None,
+    )
+
+
 async def async_main(settings: MetricsV2Settings) -> MetricsV2Batch:
     """Refresh version-matched coverage and replace only this version's marts."""
     taxonomy = load_taxonomy(settings.taxonomy_path)
@@ -111,7 +150,10 @@ async def async_main(settings: MetricsV2Settings) -> MetricsV2Batch:
         )
     store = DuckDBMetricV2Store(settings.database_path)
     await store.initialize()
-    evidence = await store.load_evidence(taxonomy.taxonomy_version)
+    evidence = await store.load_evidence(
+        taxonomy.taxonomy_version,
+        as_of=computed_at,
+    )
     batch = await asyncio.to_thread(
         build_metrics_v2,
         evidence,
@@ -119,7 +161,7 @@ async def async_main(settings: MetricsV2Settings) -> MetricsV2Batch:
         computed_at=computed_at,
         bootstrap_resamples=settings.bootstrap_resamples,
     )
-    await store.replace(batch)
+    await store.replace_corrected(batch, evidence)
     return batch
 
 
@@ -127,7 +169,18 @@ def _ranking(
     batch: MetricsV2Batch,
     context: Literal["global", "peer_family"],
 ) -> RankingV2:
-    if not batch.genre_weeks:
+    current_week = datetime.now(UTC).date()
+    current_week -= timedelta(days=current_week.weekday())
+    opportunity_estimates = tuple(
+        estimate
+        for estimate in batch.estimates
+        if estimate.week_start < current_week
+        and estimate.scope_type == "genre"
+        and estimate.context == context
+        and estimate.metric_name == "opportunity"
+        and estimate.estimate is not None
+    )
+    if not opportunity_estimates:
         return RankingV2(
             taxonomy_version=batch.taxonomy_version,
             context=context,
@@ -136,7 +189,7 @@ def _ranking(
             top=(),
             bottom=(),
         )
-    latest_week = max(row.week_start for row in batch.genre_weeks)
+    latest_week = max(row.week_start for row in opportunity_estimates)
     genres = {
         row.genre_id: row
         for row in batch.genre_weeks
@@ -257,6 +310,7 @@ def main() -> None:
         refresh_coverage=not args.skip_coverage_refresh,
     )
     batch = asyncio.run(async_main(settings))
+    _emit(_axis_summary(batch))
     _emit(_ranking(batch, "global"))
     _emit(_ranking(batch, "peer_family"))
     _emit(_coverage_summary(batch))
