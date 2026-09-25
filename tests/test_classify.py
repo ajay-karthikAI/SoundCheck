@@ -58,6 +58,37 @@ def test_all_official_link_facet_rules(url: str, rule: str) -> None:
 
 
 @pytest.mark.parametrize(
+    "url",
+    [
+        # Facet URIs observed on the public firehose that urlsplit rejects.
+        "https://NHL.com]",
+        "https://gihyo.jp](https://gihyo.jp/article/2026/09/cloudflare-worker-previews)",
+        "https://ASCII.jp\uff1anews",
+    ],
+)
+def test_unparseable_link_facets_do_not_stop_classification(url: str) -> None:
+    post = {
+        "text": "#nowplaying",
+        "createdAt": "2026-07-20T12:00:00Z",
+        "facets": [
+            {
+                "features": [
+                    {
+                        "$type": "app.bsky.richtext.facet#link",
+                        "uri": url,
+                    }
+                ]
+            }
+        ],
+    }
+
+    result = is_music_post(post)
+
+    assert result.rules == ("hashtag:#nowplaying",)
+    assert result.link_urls == (url,)
+
+
+@pytest.mark.parametrize(
     ("text", "rule"),
     [
         ("#NOWPLAYING", "hashtag:#nowplaying"),

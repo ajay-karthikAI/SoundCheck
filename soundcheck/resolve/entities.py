@@ -8,19 +8,22 @@ import re
 from collections.abc import Mapping, Sequence
 from datetime import UTC, datetime
 from typing import Protocol
-from urllib.parse import unquote_plus, urlsplit
+from urllib.parse import SplitResult, unquote_plus, urlsplit
 
 from pydantic import BaseModel, ConfigDict, Field, JsonValue, field_validator
 from rapidfuzz.fuzz import token_set_ratio
 from rapidfuzz.utils import default_process
 
 from soundcheck.ingest.http import QueryValue
+from soundcheck.ingest.lastfm.client import LastfmApiError
 from soundcheck.ingest.lastfm.models import ArtistGetInfoResponse
 
 MUSICBRAINZ_SCORE_THRESHOLD = 90.0
 MUSICBRAINZ_AMBIGUITY_MARGIN = 3.0
 LASTFM_SCORE_THRESHOLD = 92.0
 LASTFM_MIN_NAME_LENGTH = 4
+# artist.getInfo answers an unknown artist with error 6.
+LASTFM_ARTIST_NOT_FOUND_ERROR = 6
 
 _MBID_RE = re.compile(
     r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
@@ -208,9 +211,20 @@ def extract_candidate_names(text: str) -> tuple[str, ...]:
     return tuple(dict.fromkeys(value for value in cleaned if len(value) >= 2))
 
 
+def _split_url(url: str) -> SplitResult | None:
+    # Stored link_urls are raw client-supplied facet URIs, some of which
+    # urlsplit rejects (e.g. "https://NHL.com]").
+    try:
+        return urlsplit(url)
+    except ValueError:
+        return None
+
+
 def direct_musicbrainz_mbid(url: str) -> str | None:
     """Extract an artist MBID only from a direct MusicBrainz artist URL."""
-    parsed = urlsplit(url)
+    parsed = _split_url(url)
+    if parsed is None:
+        return None
     host = (parsed.hostname or "").casefold().rstrip(".")
     if host != "musicbrainz.org" and not host.endswith(".musicbrainz.org"):
         return None
@@ -223,7 +237,9 @@ def direct_musicbrainz_mbid(url: str) -> str | None:
 
 def direct_lastfm_artist_name(url: str) -> str | None:
     """Extract an explicit artist name only from a Last.fm artist URL."""
-    parsed = urlsplit(url)
+    parsed = _split_url(url)
+    if parsed is None:
+        return None
     host = (parsed.hostname or "").casefold().rstrip(".")
     if host != "last.fm" and not host.endswith(".last.fm"):
         return None
@@ -312,10 +328,15 @@ async def _resolve_post(
         if lastfm_name is None:
             continue
         linked_lastfm_names.append(lastfm_name)
-        payload = await lastfm_client.get(
-            "artist.getInfo",
-            {"artist": lastfm_name, "autocorrect": 1},
-        )
+        try:
+            payload = await lastfm_client.get(
+                "artist.getInfo",
+                {"artist": lastfm_name, "autocorrect": 1},
+            )
+        except LastfmApiError as exc:
+            if exc.code != LASTFM_ARTIST_NOT_FOUND_ERROR:
+                raise
+            continue
         artist = ArtistGetInfoResponse.model_validate(payload).artist
         if artist.mbid is not None:
             direct_links.append(

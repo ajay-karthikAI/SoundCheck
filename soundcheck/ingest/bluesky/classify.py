@@ -106,7 +106,12 @@ def _extract_hashtags(post: FeedPost) -> tuple[str, ...]:
 
 
 def _matching_link_host(url: str) -> str | None:
-    host = (urlsplit(url).hostname or "").lower().rstrip(".")
+    try:
+        host = (urlsplit(url).hostname or "").lower().rstrip(".")
+    except ValueError:
+        # Facet URIs are client-supplied (e.g. "https://NHL.com]"); one that
+        # urlsplit rejects cannot be a music link and must not stop ingestion.
+        return None
     for allowed_host in _MUSIC_LINK_HOSTS:
         if host == allowed_host or host.endswith(f".{allowed_host}"):
             return allowed_host

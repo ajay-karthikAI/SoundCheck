@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import logging
+from collections.abc import Mapping
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -96,6 +97,61 @@ async def test_ingestor_classifies_writes_utc_and_logs_counters(
     assert payload["seen"] == 1
     assert payload["matched"] == 1
     assert payload["written"] == 1
+
+
+def _commit_message(record: Mapping[str, object], time_us: int) -> str:
+    return json.dumps(
+        {
+            "did": "did:plc:test",
+            "time_us": time_us,
+            "kind": "commit",
+            "commit": {
+                "operation": "create",
+                "collection": "app.bsky.feed.post",
+                "rkey": str(time_us),
+                "record": record,
+            },
+        }
+    )
+
+
+@pytest.mark.asyncio
+async def test_ingestor_survives_malformed_public_records(
+    tmp_path: Path,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    writer = PostBatchWriter(tmp_path / "malformed.duckdb")
+    await writer.initialize()
+    logger = logging.getLogger("test.jetstream.malformed")
+    ingestor = JetstreamIngestor(writer, logger)
+    unparseable_link = {
+        "text": "#nowplaying",
+        "createdAt": "2026-07-20T12:00:00Z",
+        "facets": [
+            {
+                "features": [
+                    {
+                        "$type": "app.bsky.richtext.facet#link",
+                        "uri": "https://NHL.com]",
+                    }
+                ]
+            }
+        ],
+    }
+    overflowing_timestamp = {
+        "text": "#nowplaying",
+        "createdAt": "0001-01-01T00:00:00+05:00",
+    }
+
+    with caplog.at_level(logging.INFO, logger="test.jetstream.malformed"):
+        await ingestor.process_message(_commit_message(unparseable_link, 1))
+        await ingestor.process_message(_commit_message(overflowing_timestamp, 2))
+
+    assert ingestor.counters.seen == 2
+    assert ingestor.counters.matched == 1
+    assert json.loads(caplog.records[-1].message)["event"] == "invalid_post"
+    assert await ingestor.flush() == 1
+    assert await writer.latest_cursor() == 2
 
 
 def test_resume_url_advances_persisted_microsecond_cursor() -> None:

@@ -15,6 +15,7 @@ from pydantic import JsonValue, TypeAdapter
 from soundcheck.ingest.bluesky.models import RawBlueskyPost
 from soundcheck.ingest.bluesky.storage import PostBatchWriter
 from soundcheck.ingest.http import QueryValue
+from soundcheck.ingest.lastfm.client import LastfmApiError
 from soundcheck.ingest.lastfm.models import LastfmArtistSnapshot
 from soundcheck.ingest.lastfm.storage import LastfmSnapshotWriter
 from soundcheck.resolve.entities import (
@@ -132,6 +133,18 @@ class FakeLastfmClient:
         )
 
 
+class ErroringLastfmClient:
+    def __init__(self, code: int) -> None:
+        self.code = code
+
+    async def get(
+        self,
+        method: str,
+        params: Mapping[str, QueryValue],
+    ) -> dict[str, JsonValue]:
+        raise LastfmApiError(self.code, "The artist you supplied could not be found")
+
+
 def test_candidate_extraction_and_direct_url_guards() -> None:
     text = (
         '“Japanese Breakfast” and listening to My Bloody Valentine. '
@@ -155,6 +168,8 @@ def test_candidate_extraction_and_direct_url_guards() -> None:
         direct_lastfm_artist_name("https://www.last.fm/music/My+Bloody+Valentine")
         == "My Bloody Valentine"
     )
+    assert direct_musicbrainz_mbid("https://NHL.com]") is None
+    assert direct_lastfm_artist_name("https://NHL.com]") is None
 
 
 @pytest.mark.asyncio
@@ -235,6 +250,46 @@ async def test_ordered_ladder_alias_ambiguity_and_short_name_guard(
     ambiguity_log = json.loads(caplog.records[-1].message)
     assert ambiguity_log["event"] == "ambiguous_artist"
     assert ambiguity_log["top_score"] - ambiguity_log["second_score"] <= 3
+
+
+@pytest.mark.asyncio
+async def test_unknown_lastfm_artist_link_does_not_abort_resolution() -> None:
+    posts = (
+        RawResolutionPost(
+            uri="at://post/unknown-lastfm",
+            text="link",
+            link_urls=(
+                "https://NHL.com]",
+                "https://www.last.fm/music/Unknown+Artist",
+            ),
+        ),
+        RawResolutionPost(
+            uri="at://post/search",
+            text='Listening to "The Weeknd"',
+            link_urls=(),
+        ),
+    )
+    store = FakeStore(posts, ())
+    musicbrainz = FakeMusicBrainzClient()
+
+    counts = await resolve_entities(
+        store,
+        musicbrainz,
+        ErroringLastfmClient(6),
+        resolved_at=_NOW,
+    )
+
+    assert counts == (1, 0, 2)
+    assert store.batch is not None
+    assert [link.post_uri for link in store.batch.links] == ["at://post/search"]
+    assert 'artist:"Unknown Artist"' in musicbrainz.calls
+    with pytest.raises(LastfmApiError):
+        await resolve_entities(
+            FakeStore(posts, ()),
+            musicbrainz,
+            ErroringLastfmClient(10),
+            resolved_at=_NOW,
+        )
 
 
 @pytest.mark.asyncio

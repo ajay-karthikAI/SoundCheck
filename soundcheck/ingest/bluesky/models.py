@@ -10,7 +10,12 @@ def _as_utc(value: datetime) -> datetime:
     if value.tzinfo is None:
         msg = "timestamp must include a timezone"
         raise ValueError(msg)
-    return value.astimezone(UTC)
+    try:
+        return value.astimezone(UTC)
+    except OverflowError as exc:
+        # Pydantic only reports ValueError as a ValidationError.
+        msg = "timestamp is outside the representable UTC range"
+        raise ValueError(msg) from exc
 
 
 class Facet(BaseModel):
