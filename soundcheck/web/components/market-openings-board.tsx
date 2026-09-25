@@ -1,6 +1,5 @@
 "use client";
 
-import { ArrowUpRight, Sparkles } from "lucide-react";
 import Link from "next/link";
 import {
   CartesianGrid,
@@ -27,6 +26,7 @@ import {
   formatNumber,
   gapColor,
 } from "@/lib/format";
+import { palette } from "@/lib/palette";
 import type {
   EstimateBand,
   OpportunityItem,
@@ -167,23 +167,25 @@ export function MarketOpeningsBoard({
       : [-1, 1];
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(340px,.8fr)]">
+    <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(340px,.8fr)]">
       <Panel>
         <PanelHeader
           kicker="Compare like with like"
           title="Audience demand versus release pressure"
           meta={
-            <span className="numeral text-[9px] text-white/28">
-              size = evidence · color = discovery gap
+            <span>
+              Dot size: evidence
+              <br />
+              Color: discovery gap
             </span>
           }
         />
         <div className="relative h-[510px] px-2 pb-3 pt-7 sm:px-4">
-          <div className="pointer-events-none absolute inset-x-16 top-7 z-10 flex justify-between text-[9px] uppercase tracking-[0.14em] text-white/18">
+          <div className="pointer-events-none absolute left-28 right-10 top-14 z-10 flex justify-between font-serif text-[14px] italic text-faint">
             <span>Underserved</span>
-            <span>Hot & crowded</span>
+            <span>Hot &amp; crowded</span>
           </div>
-          <div className="pointer-events-none absolute inset-x-16 bottom-12 z-10 flex justify-between text-[9px] uppercase tracking-[0.14em] text-white/18">
+          <div className="pointer-events-none absolute bottom-[88px] left-28 right-10 z-10 flex justify-between font-serif text-[14px] italic text-faint">
             <span>Quiet</span>
             <span>Saturated</span>
           </div>
@@ -201,55 +203,56 @@ export function MarketOpeningsBoard({
                 ticks={releasePressureLevels}
                 tickFormatter={(value: number) => formatNumber(value, 1)}
                 tickLine={false}
-                axisLine={{ stroke: "rgba(255,255,255,.08)" }}
+                axisLine={{ stroke: palette.rule }}
                 label={{
-                  value: "RELEASE SUPPLY →",
+                  value: "Release supply →",
                   position: "insideBottomRight",
                   offset: -12,
-                  fill: "#55555d",
-                  fontSize: 9,
+                  fill: palette.muted,
+                  fontSize: 12,
                 }}
               />
               <YAxis
                 type="number"
                 dataKey="audienceDemand"
+                tickFormatter={(value: number) => formatNumber(value, 2)}
                 tickLine={false}
-                axisLine={{ stroke: "rgba(255,255,255,.08)" }}
+                axisLine={{ stroke: palette.rule }}
                 label={{
-                  value: "ATTENTION",
+                  value: "Attention",
                   angle: -90,
                   position: "insideLeft",
-                  fill: "#55555d",
-                  fontSize: 9,
+                  fill: palette.muted,
+                  fontSize: 12,
                 }}
               />
-              <ZAxis type="number" dataKey="evidenceVolume" range={[18, 96]} />
+              <ZAxis type="number" dataKey="evidenceVolume" range={[24, 140]} />
               <ReferenceLine
                 x={0}
-                stroke="#d6ad54"
-                strokeOpacity={0.82}
-                strokeWidth={1.5}
+                stroke={palette.ink}
+                strokeDasharray="4 4"
+                strokeWidth={1}
                 label={{
-                  value: "SUPPLY = 0",
+                  value: "Supply = 0",
                   position: "insideTopLeft",
-                  fill: "#d6ad54",
-                  fontSize: 8,
+                  fill: palette.muted,
+                  fontSize: 11,
                 }}
               />
               <ReferenceLine
                 y={0}
-                stroke="#d6ad54"
-                strokeOpacity={0.82}
-                strokeWidth={1.5}
+                stroke={palette.ink}
+                strokeDasharray="4 4"
+                strokeWidth={1}
                 label={{
-                  value: "DEMAND = 0",
+                  value: "Demand = 0",
                   position: "insideTopRight",
-                  fill: "#d6ad54",
-                  fontSize: 8,
+                  fill: palette.muted,
+                  fontSize: 11,
                 }}
               />
               <Tooltip
-                cursor={{ stroke: "rgba(255,255,255,.10)" }}
+                cursor={{ stroke: palette.rule }}
                 content={({ active, payload }) => {
                   const point = payload?.[0]?.payload as
                     | DecisionPoint
@@ -264,9 +267,9 @@ export function MarketOpeningsBoard({
                   <Cell
                     key={point.genreId}
                     fill={gapColor(point.discoveryGap.value)}
-                    fillOpacity={0.78}
-                    stroke="rgba(255,255,255,.42)"
-                    strokeWidth={0.55}
+                    fillOpacity={0.9}
+                    stroke={palette.surface}
+                    strokeWidth={1.5}
                     className="chart-dot"
                   />
                 ))}
@@ -274,9 +277,16 @@ export function MarketOpeningsBoard({
             </ScatterChart>
           </ResponsiveContainer>
         </div>
-        <div className="flex flex-wrap items-center justify-between gap-3 border-t hairline px-5 py-3 text-[10px] text-white/30">
-          <span>Horizontal spread separates tied supply scores</span>
-          <span>Tooltip retains exact supply · color = discovery gap</span>
+        <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-t border-rule px-5 py-3 text-[12px] text-faint sm:px-6">
+          <span className="inline-flex flex-wrap items-center gap-x-4 gap-y-1">
+            <LegendSwatch color={palette.accent} label="Gap above +0.35" />
+            <LegendSwatch color={palette.neutral} label="Near zero" />
+            <LegendSwatch color={palette.cool} label="Below −0.35" />
+          </span>
+          <span>
+            Tied supply scores are spread horizontally; the tooltip keeps the
+            exact value.
+          </span>
         </div>
       </Panel>
 
@@ -284,11 +294,7 @@ export function MarketOpeningsBoard({
         <PanelHeader
           kicker="Decide what to investigate"
           title="Ranked openings"
-          meta={
-            <span className="numeral text-[9px] text-white/28">
-              score · 90% range
-            </span>
-          }
+          meta={<span>Score and 90% range</span>}
         />
         <div className="max-h-[566px] overflow-y-auto">
           {ready.map((item, index) => (
@@ -304,40 +310,51 @@ export function MarketOpeningsBoard({
   );
 }
 
+function LegendSwatch({ color, label }: { color: string; label: string }) {
+  return (
+    <span className="inline-flex items-center gap-1.5">
+      <span
+        aria-hidden="true"
+        className="size-2.5 rounded-full"
+        style={{ backgroundColor: color }}
+      />
+      {label}
+    </span>
+  );
+}
+
 function OpeningTooltip({ point }: { point: DecisionPoint }) {
   return (
-    <div className="w-72 rounded-md border border-white/10 bg-[#111114] p-4 text-xs">
+    <div className="w-72 border border-ink/20 bg-surface p-4 text-[13px] text-ink shadow-[0_4px_16px_rgba(23,21,18,0.08)]">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="font-medium">{point.label}</p>
-          <p className="mt-1 text-[9px] text-white/30">{point.family}</p>
+          <p className="font-serif text-[18px] leading-tight">{point.label}</p>
+          <p className="mt-1 text-[12px] text-faint">{point.family}</p>
         </div>
         {point.breakout ? (
-          <span className="numeral text-[9px] text-accent">breakout</span>
+          <span className="text-[12px] font-medium text-accent">Breakout</span>
         ) : null}
       </div>
-      <div className="mt-4 grid grid-cols-2 gap-4 border-y hairline py-4">
+      <div className="mt-3 grid grid-cols-2 gap-4 border-y border-rule py-3">
         <TooltipBand label="Opportunity" band={point.opportunity} />
         <TooltipBand label="Discovery gap" band={point.discoveryGap} />
         <TooltipBand label="Attention" band={point.demand} />
         <TooltipBand label="Release supply" band={point.supply} />
       </div>
-      <div className="mt-3 grid gap-2 text-[9px] text-white/35">
-        <p>
-          Evidence records{" "}
-          <span className="numeral text-white/65">
-            {formatCompact(point.evidenceVolume)}
-          </span>
-        </p>
-        <p>
-          effective n · conversation / listening / supply{" "}
-          <span className="numeral text-white/65">{point.effectiveN}</span>
-        </p>
-        <p>
-          shrinkage · conversation / listening / supply{" "}
-          <span className="numeral text-white/65">{point.shrinkage}</span>
-        </p>
-      </div>
+      <dl className="numeral mt-3 grid gap-1.5 text-[12px] text-faint">
+        <div className="flex justify-between gap-3">
+          <dt>Evidence records</dt>
+          <dd className="text-ink">{formatCompact(point.evidenceVolume)}</dd>
+        </div>
+        <div className="flex justify-between gap-3">
+          <dt>Effective n (talk / listen / supply)</dt>
+          <dd className="text-ink">{point.effectiveN}</dd>
+        </div>
+        <div className="flex justify-between gap-3">
+          <dt>Shrinkage (talk / listen / supply)</dt>
+          <dd className="text-ink">{point.shrinkage}</dd>
+        </div>
+      </dl>
     </div>
   );
 }
@@ -351,15 +368,11 @@ function TooltipBand({
 }) {
   return (
     <div>
-      <p className="text-[9px] uppercase tracking-[0.1em] text-white/28">
-        {label}
-      </p>
-      <p className="numeral mt-1 text-sm text-white/80">
+      <p className="text-[12px] text-faint">{label}</p>
+      <p className="numeral mt-0.5 text-[16px] font-medium text-ink">
         {formatNumber(band.value)}
       </p>
-      <p className="numeral mt-1 text-[9px] text-white/28">
-        {formatInterval(band)}
-      </p>
+      <p className="numeral text-[12px] text-faint">{formatInterval(band)}</p>
     </div>
   );
 }
@@ -377,42 +390,36 @@ function OpeningRow({
   return (
     <Link
       href={`/genre/${item.genre.slug}?week=${item.week}`}
-      className="focus-ring group block border-b hairline px-5 py-4 last:border-0 hover:bg-white/[0.025]"
+      className="focus-ring group block border-b border-rule px-5 py-4 last:border-0 hover:bg-raised/60 sm:px-6"
     >
-      <div className="flex items-start gap-3">
-        <span className="numeral w-5 pt-0.5 text-[10px] text-white/22">
-          {String(rank).padStart(2, "0")}
+      <div className="flex items-start gap-4">
+        <span className="numeral w-6 pt-0.5 font-serif text-[20px] italic leading-none text-faint">
+          {rank}
         </span>
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-3">
             <div>
-              <p className="text-[13px] text-white/78 group-hover:text-white">
+              <p className="font-serif text-[19px] leading-tight text-ink group-hover:underline group-hover:decoration-rule group-hover:underline-offset-4">
                 {item.genre.display_name}
               </p>
-              <div className="mt-2 flex items-center gap-2">
+              <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1">
                 <CoverageBadge status={item.genre.coverage_status} />
-                <span className="text-[9px] text-white/25">
+                <span className="text-[12px] text-faint">
                   {item.genre.macro_family_name}
                 </span>
+                {item.breakout_flag ? (
+                  <span className="text-[12px] font-medium text-accent">
+                    Breakout
+                  </span>
+                ) : null}
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              {item.breakout_flag ? (
-                <Sparkles size={11} className="text-accent" />
-              ) : null}
-              <BandValue band={item.opportunity} />
-            </div>
+            <BandValue band={item.opportunity} />
           </div>
-          <div className="mt-4 flex items-center justify-between text-[9px] text-white/25">
-            <span className="numeral">
-              gap {formatNumber(item.discovery_gap.value)} ·{" "}
-              {formatInterval(item.discovery_gap)}
-            </span>
-            <ArrowUpRight
-              size={11}
-              className="opacity-0 group-hover:opacity-100"
-            />
-          </div>
+          <p className="numeral mt-3 text-[12px] text-faint">
+            Discovery gap {formatNumber(item.discovery_gap.value)}, range{" "}
+            {formatInterval(item.discovery_gap)}
+          </p>
         </div>
       </div>
     </Link>

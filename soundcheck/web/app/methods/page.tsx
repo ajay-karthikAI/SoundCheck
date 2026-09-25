@@ -31,25 +31,25 @@ export default async function MethodsPage() {
           <nav className="flex items-center gap-2 text-[10px]">
             <a
               href="#taxonomy"
-              className="focus-ring rounded-sm border hairline px-3 py-2 text-white/45 hover:border-white/18 hover:text-white"
+              className="focus-ring rounded-sm border hairline px-3 py-2 text-muted hover:border-ink/40 hover:text-ink"
             >
               Taxonomy
             </a>
             <a
               href="#coverage"
-              className="focus-ring rounded-sm border hairline px-3 py-2 text-white/45 hover:border-white/18 hover:text-white"
+              className="focus-ring rounded-sm border hairline px-3 py-2 text-muted hover:border-ink/40 hover:text-ink"
             >
               Coverage gates
             </a>
             <a
               href="#metrics"
-              className="focus-ring rounded-sm border hairline px-3 py-2 text-white/45 hover:border-white/18 hover:text-white"
+              className="focus-ring rounded-sm border hairline px-3 py-2 text-muted hover:border-ink/40 hover:text-ink"
             >
               How openings are measured
             </a>
             <a
               href="#forecasting"
-              className="focus-ring rounded-sm border hairline px-3 py-2 text-white/45 hover:border-white/18 hover:text-white"
+              className="focus-ring rounded-sm border hairline px-3 py-2 text-muted hover:border-ink/40 hover:text-ink"
             >
               How calls are validated
             </a>

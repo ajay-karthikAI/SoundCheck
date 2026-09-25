@@ -25,6 +25,7 @@ import {
   openingColor,
 } from "@/lib/format";
 import type { SceneMapPoint } from "@/lib/types";
+import { palette } from "@/lib/palette";
 
 type FamilyCentroid = {
   x: number;
@@ -52,7 +53,7 @@ export function AdjacentScenesMap({
           kicker="Taxonomy-v2 scene geometry"
           title="Creative neighborhoods, grouped by macro family"
           meta={
-            <span className="numeral text-[9px] text-white/28">
+            <span className="numeral text-[9px] text-faint">
               color = opportunity · size = evidence
             </span>
           }
@@ -84,7 +85,7 @@ export function AdjacentScenesMap({
                 range={[28, 150]}
               />
               <Tooltip
-                cursor={{ stroke: "rgba(255,255,255,.08)" }}
+                cursor={{ stroke: palette.rule }}
                 content={({ active, payload }) => {
                   const point = payload?.[0]?.payload as
                     | SceneMapPoint
@@ -102,7 +103,7 @@ export function AdjacentScenesMap({
                     fillOpacity={
                       point.genre.coverage_status === "ready" ? 0.78 : 0.18
                     }
-                    stroke="rgba(255,255,255,.38)"
+                    stroke={palette.surface}
                     strokeWidth={0.55}
                     className="chart-dot"
                   />
@@ -116,9 +117,9 @@ export function AdjacentScenesMap({
                 <LabelList
                   dataKey="label"
                   position="top"
-                  fill="rgba(255,255,255,.33)"
+                  fill={palette.faint}
                   fontSize={9}
-                  fontFamily="var(--font-geist-mono)"
+                  fontFamily="var(--font-sans)"
                 />
               </Scatter>
             </ScatterChart>
@@ -131,7 +132,7 @@ export function AdjacentScenesMap({
           kicker="Macro-family index"
           title="Navigate a scene cluster"
           meta={
-            <span className="numeral text-[9px] text-white/28">
+            <span className="numeral text-[9px] text-faint">
               {familyCounts.size} families
             </span>
           }
@@ -145,8 +146,8 @@ export function AdjacentScenesMap({
                 className="border-b hairline px-5 py-4 last:border-0"
               >
                 <div className="flex items-center justify-between">
-                  <p className="text-xs text-white/60">{family}</p>
-                  <span className="numeral text-[9px] text-white/25">
+                  <p className="text-xs text-muted">{family}</p>
+                  <span className="numeral text-[9px] text-faint">
                     {count} genres
                   </span>
                 </div>
@@ -161,7 +162,7 @@ export function AdjacentScenesMap({
                       <Link
                         key={point.genre.genre_id}
                         href={`/genre/${point.genre.slug}`}
-                        className="focus-ring rounded border hairline px-2 py-1 text-[9px] text-white/35 hover:text-white"
+                        className="focus-ring rounded border hairline px-2 py-1 text-[9px] text-faint hover:text-ink"
                       >
                         {point.genre.display_name}
                       </Link>
@@ -177,11 +178,11 @@ export function AdjacentScenesMap({
 
 function SceneTooltip({ point }: { point: SceneMapPoint }) {
   return (
-    <div className="w-64 rounded-md border border-white/10 bg-[#111114] p-4 text-xs">
+    <div className="w-64 border border-rule bg-surface shadow-[0_4px_16px_rgba(23,21,18,0.08)] p-4 text-xs">
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="font-medium">{point.genre.display_name}</p>
-          <p className="mt-1 text-[9px] text-white/30">
+          <p className="mt-1 text-[9px] text-faint">
             {point.genre.macro_family_name}
           </p>
         </div>
@@ -189,18 +190,18 @@ function SceneTooltip({ point }: { point: SceneMapPoint }) {
       </div>
       {point.opportunity ? (
         <div className="mt-4 border-t hairline pt-3">
-          <p className="text-[9px] uppercase tracking-[0.1em] text-white/27">
+          <p className="text-[9px] text-faint">
             Opportunity · 90% interval
           </p>
-          <p className="numeral mt-2 text-sm text-white/75">
+          <p className="numeral mt-2 text-sm text-ink">
             {formatNumber(point.opportunity.value)}
           </p>
-          <p className="numeral mt-1 text-[9px] text-white/28">
+          <p className="numeral mt-1 text-[9px] text-faint">
             {formatInterval(point.opportunity)}
           </p>
         </div>
       ) : (
-        <p className="mt-4 border-t hairline pt-3 text-[10px] leading-4 text-white/30">
+        <p className="mt-4 border-t hairline pt-3 text-[10px] leading-4 text-faint">
           No estimate is shown because this genre has not cleared its evidence
           gate.
         </p>

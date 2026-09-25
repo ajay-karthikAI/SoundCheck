@@ -1,9 +1,3 @@
-import {
-  AlertCircle,
-  ArrowRight,
-  Database,
-  LoaderCircle,
-} from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
@@ -26,19 +20,17 @@ export function PageHeader({
   action?: ReactNode;
 }) {
   return (
-    <div className="mb-10 grid gap-6 border-b hairline pb-10 md:grid-cols-[1fr_auto] md:items-end">
-      <div className="max-w-3xl">
-        <p className="numeral mb-3 text-[10px] uppercase tracking-[0.18em] text-accent">
-          {eyebrow}
-        </p>
-        <h1 className="max-w-2xl text-3xl font-medium tracking-[-0.035em] text-white sm:text-[40px] sm:leading-[1.08]">
+    <div className="mb-8 grid gap-8 border-b border-ink pb-8 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
+      <div className="max-w-4xl">
+        <p className="mb-4 text-[13px] font-medium text-accent">{eyebrow}</p>
+        <h1 className="text-[38px] font-normal leading-[1.05] tracking-[-0.015em] text-ink sm:text-[52px]">
           {title}
         </h1>
-        <p className="mt-4 max-w-2xl text-sm leading-6 text-white/48">
+        <p className="mt-5 max-w-2xl font-serif text-[20px] leading-[1.45] text-muted">
           {description}
         </p>
       </div>
-      {action}
+      {action ? <div className="md:pb-1.5">{action}</div> : null}
     </div>
   );
 }
@@ -51,9 +43,7 @@ export function Panel({
   className?: string;
 }) {
   return (
-    <section
-      className={`rounded-lg border hairline bg-surface ${className}`}
-    >
+    <section className={`border border-rule bg-surface ${className}`}>
       {children}
     </section>
   );
@@ -69,14 +59,12 @@ export function PanelHeader({
   meta?: ReactNode;
 }) {
   return (
-    <div className="flex items-start justify-between gap-6 border-b hairline px-5 py-4 sm:px-6">
+    <div className="flex items-start justify-between gap-6 border-b border-rule px-5 py-4 sm:px-6">
       <div>
-        <p className="numeral text-[9px] uppercase tracking-[0.16em] text-white/30">
-          {kicker}
-        </p>
-        <h2 className="mt-1 text-sm font-medium text-white/85">{title}</h2>
+        <p className="text-[12px] text-faint">{kicker}</p>
+        <h2 className="mt-1 text-[22px] leading-tight text-ink">{title}</h2>
       </div>
-      {meta}
+      {meta ? <div className="pt-0.5 text-right text-[12px] text-faint">{meta}</div> : null}
     </div>
   );
 }
@@ -93,13 +81,15 @@ export function BandValue({
   return (
     <span className="inline-flex flex-col items-end">
       <span
-        className={`numeral text-white ${
-          large ? "text-2xl tracking-[-0.04em]" : "text-sm"
+        className={`numeral text-ink ${
+          large
+            ? "font-serif text-[30px] leading-none tracking-[-0.01em]"
+            : "text-[16px] font-medium"
         }`}
       >
         {formatNumber(band.value, digits)}
       </span>
-      <span className="numeral mt-1 text-[10px] text-white/32">
+      <span className="numeral mt-1 text-[12px] text-faint">
         {formatInterval(band, digits)}
       </span>
     </span>
@@ -114,13 +104,9 @@ export function ErrorState({
   message: string;
 }) {
   return (
-    <div
-      role="alert"
-      className="flex min-h-64 flex-col items-center justify-center rounded-lg border hairline bg-surface px-6 text-center"
-    >
-      <AlertCircle className="mb-4 text-white/28" size={20} />
-      <h2 className="text-sm font-medium">{title}</h2>
-      <p className="mt-2 max-w-md text-xs leading-5 text-white/40">
+    <div role="alert" className="border-t-2 border-accent py-8">
+      <h2 className="text-[26px] leading-tight text-ink">{title}</h2>
+      <p className="mt-2 max-w-2xl text-[15px] leading-6 text-muted">
         {message}
       </p>
     </div>
@@ -135,13 +121,8 @@ export function InlineNotice({
   return (
     <div
       role="status"
-      className="mt-4 flex items-start gap-2 rounded-md border hairline bg-white/[0.018] px-4 py-3 text-[10px] leading-4 text-white/34"
+      className="mt-4 border-l-2 border-caution py-0.5 pl-4 text-[13px] leading-5 text-muted"
     >
-      <AlertCircle
-        aria-hidden="true"
-        className="mt-0.5 shrink-0 text-white/25"
-        size={12}
-      />
       {message}
     </div>
   );
@@ -161,24 +142,38 @@ export function ScopeContext({
   partialGenres?: number;
 }) {
   return (
-    <div className="mb-6 flex flex-wrap items-center gap-x-5 gap-y-2 rounded-md border hairline bg-white/[0.018] px-4 py-3 text-[10px] text-white/34">
+    <p className="numeral mb-8 flex flex-wrap items-baseline gap-x-2 gap-y-1 text-[13px] text-muted">
       <span>
-        Lens <strong className="font-medium text-white/65">{family}</strong>
+        Lens: <strong className="font-medium text-ink">{family}</strong>
       </span>
+      <Separator />
       <span>
-        Comparison{" "}
-        <strong className="font-medium text-white/65">
+        Compared with{" "}
+        <strong className="font-medium text-ink">
           {context === "peer_family" ? "family peers" : "all genres"}
         </strong>
       </span>
-      <span className="numeral">{taxonomyVersion}</span>
+      <Separator />
+      <span>{taxonomyVersion}</span>
       {readyGenres !== undefined ? (
-        <span className="numeral text-white/45">
-          {readyGenres} decision-ready
-          {partialGenres ? ` · ${partialGenres} still collecting` : ""}
-        </span>
+        <>
+          <Separator />
+          <span>
+            <strong className="font-medium text-ink">{readyGenres}</strong>{" "}
+            decision-ready
+            {partialGenres ? `, ${partialGenres} still collecting` : ""}
+          </span>
+        </>
       ) : null}
-    </div>
+    </p>
+  );
+}
+
+function Separator() {
+  return (
+    <span aria-hidden="true" className="text-faint">
+      ·
+    </span>
   );
 }
 
@@ -187,18 +182,18 @@ export function CoverageBadge({
 }: {
   status: CoverageStatus;
 }) {
-  const ready = status === "ready";
+  const tone =
+    status === "ready"
+      ? "text-confirm"
+      : status === "unsupported"
+        ? "text-faint"
+        : "text-caution";
   return (
     <span
-      className={`numeral inline-flex rounded-full border px-2 py-1 text-[8px] uppercase tracking-[0.1em] ${
-        ready
-          ? "border-accent/25 bg-accent/[0.08] text-[#aeb4ff]"
-          : status === "unsupported"
-            ? "border-white/[0.05] text-white/22"
-            : "border-[#b99c6f]/20 bg-[#b99c6f]/[0.06] text-[#c8b086]"
-      }`}
+      className={`inline-flex items-center gap-1.5 whitespace-nowrap text-[12px] font-medium ${tone}`}
     >
-      {coverageLabel(status)}
+      <span aria-hidden="true" className="size-1.5 rounded-full bg-current" />
+      {sentenceCase(coverageLabel(status))}
     </span>
   );
 }
@@ -214,14 +209,12 @@ export function CoverageExplanation({
   return (
     <div
       role="status"
-      className={`rounded-md border border-[#b99c6f]/15 bg-[#b99c6f]/[0.035] ${
-        compact ? "px-3 py-2" : "px-5 py-4"
-      }`}
+      className={`border-l-2 border-caution pl-4 ${compact ? "py-0.5" : "py-1"}`}
     >
-      <p className="text-xs font-medium text-[#cfb98d]">
+      <p className="text-[14px] font-medium text-caution">
         {coverageTitle(status)}
       </p>
-      <p className="mt-1 max-w-2xl text-[10px] leading-5 text-white/35">
+      <p className="mt-1 max-w-2xl text-[13px] leading-5 text-muted">
         {coverageDescription(status)}
       </p>
     </div>
@@ -242,22 +235,20 @@ export function EmptyState({
   linkLabel?: string;
 }) {
   return (
-    <div className="flex min-h-72 flex-col items-center justify-center rounded-lg border hairline bg-surface px-6 text-center">
-      <Database className="mb-5 text-white/22" size={21} strokeWidth={1.5} />
-      <p className="numeral text-[9px] uppercase tracking-[0.16em] text-white/28">
-        {eyebrow}
-      </p>
-      <h2 className="mt-3 text-base font-medium">{title}</h2>
-      <p className="mt-2 max-w-md text-xs leading-5 text-white/40">
+    <div className="border-y border-rule py-10">
+      <p className="text-[13px] font-medium text-caution">{eyebrow}</p>
+      <h2 className="mt-2 max-w-2xl text-[28px] leading-tight text-ink">
+        {title}
+      </h2>
+      <p className="mt-3 max-w-2xl text-[15px] leading-6 text-muted">
         {message}
       </p>
       {href && linkLabel ? (
         <Link
           href={href}
-          className="focus-ring mt-5 inline-flex items-center gap-2 rounded-sm text-xs text-accent hover:text-white"
+          className="focus-ring mt-5 inline-block text-[14px] font-medium text-accent underline decoration-accent/40 underline-offset-4 hover:decoration-accent"
         >
-          {linkLabel}
-          <ArrowRight size={13} />
+          {linkLabel} →
         </Link>
       ) : null}
     </div>
@@ -266,12 +257,12 @@ export function EmptyState({
 
 export function LoadingState() {
   return (
-    <div className="flex min-h-72 items-center justify-center rounded-lg border hairline bg-surface">
-      <LoaderCircle
-        aria-label="Loading"
-        className="animate-spin text-white/25"
-        size={20}
-      />
+    <div
+      role="status"
+      aria-label="Loading"
+      className="border-y border-rule py-16 text-center font-serif text-[17px] italic text-faint"
+    >
+      Loading…
     </div>
   );
 }
@@ -284,17 +275,21 @@ export function StatusPill({
   tone?: "neutral" | "accent" | "muted";
 }) {
   const toneClass = {
-    neutral: "border-white/10 bg-white/[0.035] text-white/55",
-    accent: "border-accent/30 bg-accent/10 text-[#aeb4ff]",
-    muted: "border-white/[0.06] bg-transparent text-white/28",
+    neutral: "border-ink/25 text-muted",
+    accent: "border-accent/40 text-accent",
+    muted: "border-rule text-faint",
   }[tone];
   return (
     <span
-      className={`numeral inline-flex items-center rounded-full border px-2 py-1 text-[9px] uppercase tracking-[0.1em] ${toneClass}`}
+      className={`inline-flex items-center whitespace-nowrap border px-1.5 py-0.5 text-[11px] font-medium ${toneClass}`}
     >
       {children}
     </span>
   );
+}
+
+function sentenceCase(value: string): string {
+  return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
 export function coverageLabel(status: CoverageStatus): string {

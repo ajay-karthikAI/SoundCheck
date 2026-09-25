@@ -29,6 +29,7 @@ import type {
   ForecastItem,
   GenreTimeseries,
 } from "@/lib/types";
+import { palette } from "@/lib/palette";
 
 type ChartPoint = {
   week: string;
@@ -139,7 +140,7 @@ export function SceneDecisionHistory({
               dataKey="week"
               tickFormatter={formatWeek}
               tickLine={false}
-              axisLine={{ stroke: "rgba(255,255,255,.08)" }}
+              axisLine={{ stroke: palette.rule }}
               minTickGap={34}
             />
             <YAxis
@@ -150,13 +151,13 @@ export function SceneDecisionHistory({
                 value: "WITHIN-WEEK Z",
                 angle: -90,
                 position: "insideLeft",
-                fill: "#55555d",
+                fill: palette.muted,
                 fontSize: 9,
               }}
             />
             <ReferenceLine
               y={0}
-              stroke="rgba(255,255,255,.15)"
+              stroke={palette.faint}
               strokeDasharray="2 4"
             />
             <Tooltip
@@ -168,41 +169,41 @@ export function SceneDecisionHistory({
             <Area
               dataKey="conversationBand"
               stroke="none"
-              fill="#6872f3"
+              fill={palette.accent}
               fillOpacity={0.1}
               isAnimationActive={false}
             />
             <Area
               dataKey="listeningBand"
               stroke="none"
-              fill="#d7d7db"
+              fill={palette.ink}
               fillOpacity={0.06}
               isAnimationActive={false}
             />
             <Area
               dataKey="supplyBand"
               stroke="none"
-              fill="#7d7d84"
+              fill={palette.faint}
               fillOpacity={0.05}
               isAnimationActive={false}
             />
             <Area
               dataKey="forecastConversationBand"
               stroke="none"
-              fill="#6872f3"
+              fill={palette.accent}
               fillOpacity={0.18}
               isAnimationActive={false}
             />
             <Area
               dataKey="forecastListeningBand"
               stroke="none"
-              fill="#d7d7db"
+              fill={palette.ink}
               fillOpacity={0.1}
               isAnimationActive={false}
             />
             <Line
               dataKey="conversation"
-              stroke="#6872f3"
+              stroke={palette.accent}
               strokeWidth={1.8}
               dot={false}
               connectNulls
@@ -210,7 +211,7 @@ export function SceneDecisionHistory({
             />
             <Line
               dataKey="listening"
-              stroke="#d7d7db"
+              stroke={palette.ink}
               strokeWidth={1.35}
               dot={false}
               connectNulls
@@ -218,7 +219,7 @@ export function SceneDecisionHistory({
             />
             <Line
               dataKey="supply"
-              stroke="#777780"
+              stroke={palette.faint}
               strokeWidth={1.1}
               dot={false}
               connectNulls
@@ -226,7 +227,7 @@ export function SceneDecisionHistory({
             />
             <Line
               dataKey="conversationEwma"
-              stroke="#6872f3"
+              stroke={palette.accent}
               strokeOpacity={0.38}
               strokeDasharray="3 5"
               dot={false}
@@ -235,7 +236,7 @@ export function SceneDecisionHistory({
             />
             <Line
               dataKey="listeningEwma"
-              stroke="#d7d7db"
+              stroke={palette.ink}
               strokeOpacity={0.3}
               strokeDasharray="3 5"
               dot={false}
@@ -244,7 +245,7 @@ export function SceneDecisionHistory({
             />
             <Line
               dataKey="supplyEwma"
-              stroke="#777780"
+              stroke={palette.faint}
               strokeOpacity={0.3}
               strokeDasharray="3 5"
               dot={false}
@@ -253,19 +254,19 @@ export function SceneDecisionHistory({
             />
             <Line
               dataKey="forecastConversation"
-              stroke="#6872f3"
+              stroke={palette.accent}
               strokeWidth={1.8}
               strokeDasharray="2 4"
-              dot={{ r: 2.5, fill: "#6872f3" }}
+              dot={{ r: 2.5, fill: palette.accent }}
               connectNulls
               isAnimationActive={false}
             />
             <Line
               dataKey="forecastListening"
-              stroke="#d7d7db"
+              stroke={palette.ink}
               strokeWidth={1.35}
               strokeDasharray="2 4"
-              dot={{ r: 2.5, fill: "#d7d7db" }}
+              dot={{ r: 2.5, fill: palette.ink }}
               connectNulls
               isAnimationActive={false}
             />
@@ -292,7 +293,7 @@ export function ForecastDecisionRecord({
         kicker="What may move next"
         title="Published calls with validation next to every estimate"
         meta={
-          <span className="numeral text-[9px] text-white/28">
+          <span className="numeral text-[9px] text-faint">
             80% prediction intervals
           </span>
         }
@@ -317,14 +318,14 @@ function ForecastRow({ forecast }: { forecast: ForecastItem }) {
     return (
       <div className="grid gap-3 px-5 py-5 sm:grid-cols-[150px_1fr_auto] sm:items-center sm:px-6">
         <div>
-          <p className="text-xs font-medium capitalize text-white/65">
+          <p className="text-xs font-medium capitalize text-muted">
             {forecast.target_axis}
           </p>
-          <p className="numeral mt-1 text-[9px] text-white/25">
+          <p className="numeral mt-1 text-[9px] text-faint">
             horizon {forecast.horizon}
           </p>
         </div>
-        <p className="text-[10px] leading-5 text-white/36">
+        <p className="text-[10px] leading-5 text-faint">
           Insufficient history: {forecast.valid_training_weeks} of 8 valid
           weeks. No prediction and no skill claim are published yet.
         </p>
@@ -336,15 +337,15 @@ function ForecastRow({ forecast }: { forecast: ForecastItem }) {
   return (
     <div className="grid gap-4 px-5 py-5 sm:grid-cols-[150px_1fr_1fr_auto] sm:items-center sm:px-6">
       <div>
-        <p className="text-xs font-medium capitalize text-white/70">
+        <p className="text-xs font-medium capitalize text-ink">
           {forecast.target_axis}
         </p>
-        <p className="numeral mt-1 text-[9px] text-white/26">
+        <p className="numeral mt-1 text-[9px] text-faint">
           {forecast.target_week ?? "next week"} · h{forecast.horizon}
         </p>
       </div>
       <BandValue band={forecast.prediction_interval_80} />
-      <div className="numeral text-[9px] leading-5 text-white/30">
+      <div className="numeral text-[9px] leading-5 text-faint">
         <p>
           {forecast.model ? modelLabel(forecast.model) : "Naive"} · genre MASE{" "}
           {formatScore(forecast.genre_validation?.mase)}
@@ -363,8 +364,8 @@ function ForecastRow({ forecast }: { forecast: ForecastItem }) {
 
 function HistoryTooltip({ point }: { point: ChartPoint }) {
   return (
-    <div className="w-64 rounded-md border border-white/10 bg-[#111114] p-4">
-      <p className="numeral text-[10px] text-white/50">
+    <div className="w-64 border border-rule bg-surface shadow-[0_4px_16px_rgba(23,21,18,0.08)] p-4">
+      <p className="numeral text-[10px] text-muted">
         {formatWeek(point.week)}
       </p>
       <div className="mt-3 space-y-2">
@@ -410,11 +411,11 @@ function TooltipBand({
   if (value === undefined || !band) return null;
   return (
     <div className="flex items-start justify-between gap-4 text-[9px]">
-      <span className="text-white/30">{label}</span>
-      <span className="numeral text-right text-white/65">
+      <span className="text-faint">{label}</span>
+      <span className="numeral text-right text-muted">
         {formatNumber(value)}
         <br />
-        <span className="text-white/25">
+        <span className="text-faint">
           {formatNumber(band[0])} — {formatNumber(band[1])}
         </span>
       </span>
@@ -424,10 +425,10 @@ function TooltipBand({
 
 function SeriesKeys() {
   return (
-    <div className="hidden items-center gap-4 text-[9px] text-white/32 sm:flex">
-      <span className="text-[#8f97ff]">Conversation</span>
-      <span className="text-[#d7d7db]">Listening change</span>
-      <span className="text-[#777780]">Release supply</span>
+    <div className="hidden items-center gap-4 text-[9px] text-faint sm:flex">
+      <span className="text-accent">Conversation</span>
+      <span className="text-ink">Listening change</span>
+      <span className="text-faint">Release supply</span>
     </div>
   );
 }

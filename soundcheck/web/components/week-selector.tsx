@@ -1,6 +1,5 @@
 "use client";
 
-import { CalendarDays } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import { formatWeek } from "@/lib/format";
@@ -28,13 +27,15 @@ export function WeekSelector({
   }
 
   return (
-    <label className="flex items-center gap-2">
-      <CalendarDays aria-hidden="true" size={13} className="text-white/35" />
+    <label className="inline-flex items-baseline gap-2.5 text-[13px]">
+      <span aria-hidden="true" className="text-faint">
+        Week
+      </span>
       <span className="sr-only">Select ISO week</span>
       <select
         value={selectedWeek ?? ""}
         onChange={(event) => chooseWeek(event.target.value)}
-        className="focus-ring numeral rounded-md border hairline bg-surface px-3 py-2 text-[11px] text-white/65 hover:border-white/15"
+        className="select-underline focus-ring numeral text-[13px]"
       >
         <option value="">Latest decision-ready week</option>
         {availableWeeks.map((week) => (

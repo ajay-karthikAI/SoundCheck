@@ -1,6 +1,5 @@
 "use client";
 
-import { Search } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 
@@ -11,22 +10,13 @@ import type {
 
 export function GenreSearchForm() {
   return (
-    <form
-      action="/search"
-      className="relative w-full sm:w-64"
-      role="search"
-    >
-      <Search
-        aria-hidden="true"
-        className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-white/25"
-        size={13}
-      />
+    <form action="/search" className="w-full sm:w-64" role="search">
       <input
         aria-label="Search genres"
         name="q"
         type="search"
         placeholder="Search every genre"
-        className="focus-ring h-9 w-full rounded-md border hairline bg-white/[0.025] pl-9 pr-3 text-xs text-white/75 placeholder:text-white/25"
+        className="focus-ring h-9 w-full border-0 border-b border-ink/30 bg-transparent px-0 text-[14px] text-ink placeholder:text-faint hover:border-ink focus:border-ink"
       />
     </form>
   );
@@ -47,8 +37,9 @@ export function MacroFamilyNavigation({
   return (
     <nav
       aria-label="Macro-family navigation"
-      className="flex items-center gap-1 overflow-x-auto py-3"
+      className="flex flex-wrap items-baseline gap-x-3 gap-y-1.5 py-3 text-[12px]"
     >
+      <span className="shrink-0 text-faint">Lens</span>
       <FamilyLink
         href={scopeHref(pathname, searchParams, "all")}
         active={selected === "all"}
@@ -86,17 +77,15 @@ function FamilyLink({
     <Link
       href={href}
       aria-current={active ? "true" : undefined}
-      className={`focus-ring inline-flex shrink-0 items-center gap-2 rounded-full border px-3 py-1.5 text-[10px] ${
-        active
-          ? "border-accent/40 bg-accent/10 text-white"
-          : "border-white/[0.07] text-white/38 hover:border-white/15 hover:text-white/70"
+      className={`focus-ring shrink-0 whitespace-nowrap ${
+        active ? "font-medium text-ink" : "text-muted hover:text-ink"
       }`}
     >
-      {label}
+      <span className={active ? "border-b-2 border-accent pb-0.5" : undefined}>
+        {label}
+      </span>
       {indieLens ? (
-        <span className="numeral text-[8px] uppercase tracking-[0.1em] text-accent">
-          indie lens
-        </span>
+        <span className="ml-1.5 font-serif italic text-accent">indie lens</span>
       ) : null}
     </Link>
   );
@@ -111,14 +100,19 @@ export function ComparisonControl({
   const searchParams = useSearchParams();
   return (
     <div
-      className="inline-flex rounded-md border hairline bg-surface p-1"
+      role="group"
       aria-label="Comparison context"
+      className="inline-flex items-baseline gap-2.5 text-[13px]"
     >
+      <span className="text-faint">Compare with</span>
       <ContextLink
         href={contextHref(pathname, searchParams, "peer_family")}
         active={context === "peer_family"}
         label="Family peers"
       />
+      <span aria-hidden="true" className="text-rule">
+        /
+      </span>
       <ContextLink
         href={contextHref(pathname, searchParams, "global")}
         active={context === "global"}
@@ -141,10 +135,10 @@ function ContextLink({
     <Link
       href={href}
       aria-current={active ? "true" : undefined}
-      className={`focus-ring rounded px-3 py-1.5 text-[10px] ${
+      className={`focus-ring ${
         active
-          ? "bg-white/[0.08] text-white"
-          : "text-white/32 hover:text-white/70"
+          ? "border-b-2 border-accent pb-0.5 font-medium text-ink"
+          : "text-muted hover:text-ink"
       }`}
     >
       {label}

@@ -1,27 +1,17 @@
 "use client";
 
-import {
-  Activity,
-  AudioLines,
-  FileText,
-  Gauge,
-  Map,
-  Radar,
-  Radio,
-  Telescope,
-} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const navItems = [
-  { href: "/", label: "Market openings", icon: Radar },
-  { href: "/evidence", label: "Live evidence", icon: Radio },
-  { href: "/next-up", label: "Next week", icon: Telescope },
-  { href: "/gap", label: "Unspoken demand", icon: AudioLines },
-  { href: "/ecosystem", label: "Discovery health", icon: Activity },
-  { href: "/map", label: "Adjacent scenes", icon: Map },
-  { href: "/briefs", label: "Creator moves", icon: FileText },
-  { href: "/methods", label: "Evidence & methods", icon: Gauge },
+  { href: "/", label: "Market openings" },
+  { href: "/evidence", label: "Live evidence" },
+  { href: "/next-up", label: "Next week" },
+  { href: "/gap", label: "Unspoken demand" },
+  { href: "/ecosystem", label: "Discovery health" },
+  { href: "/map", label: "Adjacent scenes" },
+  { href: "/briefs", label: "Creator moves" },
+  { href: "/methods", label: "Evidence & methods" },
 ] as const;
 
 export function SiteNav() {
@@ -30,9 +20,9 @@ export function SiteNav() {
   return (
     <nav
       aria-label="Primary navigation"
-      className="flex items-center gap-1 overflow-x-auto pb-px"
+      className="flex items-center gap-x-7 overflow-x-auto border-b border-rule"
     >
-      {navItems.map(({ href, label, icon: Icon }) => {
+      {navItems.map(({ href, label }) => {
         const active =
           href === "/" ? pathname === "/" : pathname.startsWith(href);
         return (
@@ -40,18 +30,12 @@ export function SiteNav() {
             key={href}
             href={href}
             aria-current={active ? "page" : undefined}
-            className={`focus-ring flex shrink-0 items-center gap-2 rounded-md px-3 py-2 text-[13px] transition-colors duration-150 ease-out ${
+            className={`focus-ring -mb-px shrink-0 border-b-2 py-3.5 text-[14px] transition-colors duration-150 ease-out ${
               active
-                ? "bg-white/[0.07] text-white"
-                : "text-white/45 hover:bg-white/[0.035] hover:text-white/80"
+                ? "border-accent font-medium text-ink"
+                : "border-transparent text-muted hover:text-ink"
             }`}
           >
-            <Icon
-              aria-hidden="true"
-              className={active ? "text-accent" : ""}
-              size={14}
-              strokeWidth={1.7}
-            />
             {label}
           </Link>
         );

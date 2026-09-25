@@ -57,17 +57,17 @@ export default async function NextUpPage({
             ) : undefined
           }
         />
-        <div className="-mt-3 grid gap-px overflow-hidden rounded-lg border hairline bg-white/[0.08] sm:grid-cols-3">
+        <div className="-mt-3 grid gap-px overflow-hidden border hairline bg-ink/[0.08] sm:grid-cols-3">
           {[
             ["Eligibility", "Quiet-riser evidence"],
             ["Evidence bar", "Beats persistence"],
             ["Fallback", "Baseline stays visible"],
           ].map(([label, value]) => (
             <div key={label} className="bg-surface px-5 py-4">
-              <p className="numeral text-[9px] uppercase tracking-[0.14em] text-white/25">
+              <p className="numeral text-[9px] text-faint">
                 {label}
               </p>
-              <p className="mt-1 text-xs text-white/60">{value}</p>
+              <p className="mt-1 text-xs text-muted">{value}</p>
             </div>
           ))}
         </div>

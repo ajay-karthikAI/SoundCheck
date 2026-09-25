@@ -21,6 +21,7 @@ import type {
   EcosystemPoint,
   EstimateBand,
 } from "@/lib/types";
+import { palette } from "@/lib/palette";
 
 type HealthChartRow = {
   week: string;
@@ -54,7 +55,7 @@ export function DiscoveryHealthReport({
   }));
   return (
     <div className="space-y-6">
-      <div className="grid gap-px overflow-hidden rounded-lg border hairline bg-white/[0.08] sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-px overflow-hidden border hairline bg-ink/[0.08] sm:grid-cols-2 lg:grid-cols-4">
         <HealthCard
           label="Listening diversity"
           band={latest.listening_entropy}
@@ -99,12 +100,12 @@ export function DiscoveryHealthReport({
           kicker="Decision read"
           title="What the latest week says about discovery"
           meta={
-            <span className="numeral text-[9px] text-white/28">
+            <span className="numeral text-[9px] text-faint">
               {formatWeek(latest.week)}
             </span>
           }
         />
-        <div className="grid gap-px bg-white/[0.06] md:grid-cols-3">
+        <div className="grid gap-px bg-ink/[0.06] md:grid-cols-3">
           <HealthRead
             title="Breadth"
             text={breadthRead(latest)}
@@ -134,17 +135,17 @@ function HealthCard({
 }) {
   return (
     <div className="bg-surface px-5 py-5">
-      <p className="text-[9px] uppercase tracking-[0.12em] text-white/28">
+      <p className="text-[9px] text-faint">
         {label}
       </p>
       <div className="mt-3 min-h-10">
         {band ? (
           <BandValue band={band} large />
         ) : (
-          <span className="numeral text-sm text-white/25">Unavailable</span>
+          <span className="numeral text-sm text-faint">Unavailable</span>
         )}
       </div>
-      <p className="mt-3 text-[9px] text-white/24">{detail}</p>
+      <p className="mt-3 text-[9px] text-faint">{detail}</p>
     </div>
   );
 }
@@ -185,13 +186,13 @@ function HealthChart({
             <Area
               dataKey={rangeKey}
               stroke="none"
-              fill="#6872f3"
+              fill={palette.accent}
               fillOpacity={0.1}
               isAnimationActive={false}
             />
             <Line
               dataKey={valueKey}
-              stroke="#8189ff"
+              stroke={palette.accent}
               strokeWidth={1.5}
               dot={false}
               connectNulls={false}
@@ -221,14 +222,14 @@ function HealthTooltip({
     valueKey === "effective" ? row?.effectiveRange : row?.hhiRange;
   if (!active || !row || value == null || !range) return null;
   return (
-    <div className="rounded-md border border-white/10 bg-[#111114] p-3 text-xs">
-      <p className="numeral text-[9px] text-white/30">
+    <div className="border border-rule bg-surface shadow-[0_4px_16px_rgba(23,21,18,0.08)] p-3 text-xs">
+      <p className="numeral text-[9px] text-faint">
         {formatWeek(label ?? row.week)}
       </p>
-      <p className="numeral mt-2 text-white/75">
+      <p className="numeral mt-2 text-ink">
         {formatNumber(value)}
       </p>
-      <p className="numeral mt-1 text-[9px] text-white/30">
+      <p className="numeral mt-1 text-[9px] text-faint">
         {formatNumber(range[0])} — {formatNumber(range[1])}
       </p>
     </div>
@@ -244,10 +245,10 @@ function HealthRead({
 }) {
   return (
     <div className="bg-surface px-5 py-5">
-      <p className="numeral text-[9px] uppercase tracking-[0.12em] text-white/27">
+      <p className="numeral text-[9px] text-faint">
         {title}
       </p>
-      <p className="mt-2 text-xs leading-5 text-white/48">{text}</p>
+      <p className="mt-2 text-xs leading-5 text-muted">{text}</p>
     </div>
   );
 }

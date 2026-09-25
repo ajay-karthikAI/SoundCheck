@@ -59,18 +59,18 @@ export default async function SearchPage({
                   <div className="flex flex-wrap items-center gap-3">
                     <Link
                       href={`/genre/${genre.slug}`}
-                      className="focus-ring text-sm font-medium text-white/78 hover:text-white"
+                      className="focus-ring text-sm font-medium text-ink hover:text-ink"
                     >
                       {genre.display_name}
                     </Link>
                     <CoverageBadge status={genre.coverage_status} />
                   </div>
-                  <p className="mt-2 text-[10px] text-white/30">
+                  <p className="mt-2 text-[10px] text-faint">
                     {genre.macro_family_name} ·{" "}
                     <span className="numeral">{genre.genre_id}</span>
                   </p>
                 </div>
-                <p className="numeral text-[9px] text-white/25">
+                <p className="numeral text-[9px] text-faint">
                   taxonomy {genre.taxonomy_version}
                 </p>
                 {genre.coverage_status !== "ready" ? (

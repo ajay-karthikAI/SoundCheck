@@ -2,19 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Editorial palette as RGB channels so Tailwind opacity modifiers work.
+   lib/palette.ts mirrors these values for SVG chart attributes.
+   Text colors keep at least 4.5:1 contrast on both paper and surface. */
 :root {
-  color-scheme: dark;
-  --canvas: #0a0a0b;
-  --surface: #101012;
-  --raised: #151518;
-  --border: rgba(255, 255, 255, 0.08);
-  --border-strong: rgba(255, 255, 255, 0.14);
-  --text: #f2f2f3;
-  --muted: #929299;
-  --faint: #5f5f66;
-  --accent: #6872f3;
-  --positive: #87a48e;
-  --negative: #b98585;
+  color-scheme: light;
+  --paper: 209 208 204; /* #D1D0CC */
+  --surface: 218 217 213; /* #DAD9D5 */
+  --raised: 200 199 194; /* #C8C7C2 */
+  --ink: 23 21 18; /* #171512 */
+  --muted: 72 68 62; /* #48443E */
+  --faint: 92 87 79; /* #5C574F */
+  --rule: 181 179 174; /* #B5B3AE */
+  --accent: 160 46 23; /* #A02E17 */
+  --cool: 46 98 140; /* #2E628C */
+  --caution: 107 77 15; /* #6B4D0F */
+  --confirm: 36 90 66; /* #245A42 */
 }
 
 * {
@@ -22,23 +25,31 @@
 }
 
 html {
-  background: var(--canvas);
+  background: rgb(var(--paper));
   scroll-behavior: smooth;
 }
 
 body {
   min-height: 100vh;
   margin: 0;
-  background: var(--canvas);
-  color: var(--text);
-  font-family: var(--font-geist-sans), Inter, sans-serif;
-  font-feature-settings: "ss01", "ss03";
+  background: rgb(var(--paper));
+  color: rgb(var(--ink));
+  font-family: var(--font-sans), "Public Sans", "Helvetica Neue", Arial,
+    sans-serif;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-serif), Newsreader, Georgia, serif;
+  font-weight: 500;
 }
 
 ::selection {
-  background: rgba(104, 114, 243, 0.28);
-  color: white;
+  background: rgb(var(--accent) / 0.18);
+  color: rgb(var(--ink));
 }
 
 a,
@@ -55,82 +66,96 @@ select {
 }
 
 .numeral {
-  font-family: var(--font-geist-mono), "JetBrains Mono", monospace;
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: tabular-nums lining-nums;
 }
 
 .hairline {
-  border-color: var(--border);
+  border-color: rgb(var(--rule));
 }
 
 .focus-ring:focus-visible {
-  outline: 1px solid var(--accent);
+  outline: 2px solid rgb(var(--accent));
   outline-offset: 3px;
 }
 
+.select-underline {
+  appearance: none;
+  border: 0;
+  border-bottom: 1px solid rgb(var(--ink) / 0.3);
+  border-radius: 0;
+  background: transparent
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23171512' stroke-width='1.3'/%3E%3C/svg%3E")
+    no-repeat right 0.1rem center;
+  padding: 0.25rem 1.25rem 0.25rem 0;
+  color: rgb(var(--ink));
+  cursor: pointer;
+}
+
+.select-underline:hover {
+  border-bottom-color: rgb(var(--ink));
+}
+
 .chart-grid line {
-  stroke: rgba(255, 255, 255, 0.06);
+  stroke: rgb(var(--rule));
 }
 
 .recharts-cartesian-axis-tick-value,
 .recharts-polar-angle-axis-tick-value {
-  fill: #73737b;
-  font-family: var(--font-geist-mono), monospace;
+  fill: rgb(var(--faint));
+  font-family: var(--font-sans), "Public Sans", sans-serif;
   font-size: 11px;
   font-variant-numeric: tabular-nums;
 }
 
 .recharts-tooltip-cursor {
-  stroke: rgba(255, 255, 255, 0.12);
+  stroke: rgb(var(--ink) / 0.2);
 }
 
 .chart-dot {
-  filter: drop-shadow(0 0 3px rgba(104, 114, 243, 0.12));
   transform-box: fill-box;
   transform-origin: center;
   transition:
     opacity 150ms ease,
-    filter 150ms ease,
     transform 150ms ease;
 }
 
 .chart-dot:hover {
-  filter: drop-shadow(0 0 5px rgba(135, 144, 255, 0.28));
   opacity: 1;
   transform: scale(1.18);
 }
 
 .method-copy {
-  max-width: 78ch;
-  color: rgba(255, 255, 255, 0.56);
-  font-size: 0.875rem;
-  line-height: 1.75;
+  max-width: 70ch;
+  color: rgb(var(--ink) / 0.86);
+  font-family: var(--font-serif), Newsreader, Georgia, serif;
+  font-size: 1.125rem;
+  line-height: 1.7;
 }
 
 .method-copy h1,
 .method-copy h2,
 .method-copy h3 {
-  color: rgba(255, 255, 255, 0.9);
-  font-weight: 500;
-  letter-spacing: -0.025em;
+  color: rgb(var(--ink));
+  letter-spacing: -0.01em;
   scroll-margin-top: 6rem;
 }
 
 .method-copy h1 {
   margin: 0 0 2rem;
-  font-size: 1.75rem;
+  font-size: 2.25rem;
+  line-height: 1.15;
 }
 
 .method-copy h2 {
   margin: 3rem 0 1rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--border);
-  font-size: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgb(var(--ink));
+  font-size: 1.5rem;
 }
 
 .method-copy h3 {
   margin: 2rem 0 0.75rem;
-  font-size: 1rem;
+  font-size: 1.2rem;
 }
 
 .method-copy p,
@@ -160,31 +185,33 @@ select {
 }
 
 .method-copy a {
-  color: #aeb4ff;
+  color: rgb(var(--accent));
   text-decoration: underline;
+  text-decoration-color: rgb(var(--accent) / 0.4);
   text-underline-offset: 3px;
 }
 
+.method-copy a:hover {
+  text-decoration-color: rgb(var(--accent));
+}
+
 .method-copy code {
-  border: 1px solid var(--border);
-  border-radius: 0.2rem;
-  background: rgba(255, 255, 255, 0.035);
+  background: rgb(var(--raised));
   padding: 0.1rem 0.3rem;
-  color: rgba(255, 255, 255, 0.72);
-  font-family: var(--font-geist-mono), monospace;
-  font-size: 0.82em;
+  color: rgb(var(--ink));
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.8em;
 }
 
 .method-copy pre {
   overflow-x: auto;
-  border: 1px solid var(--border);
-  border-radius: 0.35rem;
-  background: #0d0d0f;
+  border-top: 1px solid rgb(var(--rule));
+  border-bottom: 1px solid rgb(var(--rule));
+  background: rgb(var(--surface));
   padding: 1rem;
 }
 
 .method-copy pre code {
-  border: 0;
   background: transparent;
   padding: 0;
 }
@@ -192,27 +219,29 @@ select {
 .method-copy table {
   width: 100%;
   border-collapse: collapse;
-  font-family: var(--font-geist-mono), monospace;
-  font-size: 0.72rem;
+  font-family: var(--font-sans), "Public Sans", sans-serif;
+  font-size: 0.85rem;
   font-variant-numeric: tabular-nums;
 }
 
 .method-copy th,
 .method-copy td {
-  border-bottom: 1px solid var(--border);
-  padding: 0.65rem 0.75rem;
+  border-bottom: 1px solid rgb(var(--rule));
+  padding: 0.6rem 0.75rem 0.6rem 0;
   text-align: left;
 }
 
 .method-copy th {
-  color: rgba(255, 255, 255, 0.76);
-  font-weight: 500;
+  border-bottom-color: rgb(var(--ink));
+  color: rgb(var(--ink));
+  font-weight: 600;
 }
 
 .method-copy blockquote {
-  border-left: 2px solid var(--accent);
+  border-left: 2px solid rgb(var(--accent));
   padding-left: 1rem;
-  color: rgba(255, 255, 255, 0.42);
+  color: rgb(var(--muted));
+  font-style: italic;
 }
 
 @media (prefers-reduced-motion: reduce) {

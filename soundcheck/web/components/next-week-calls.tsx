@@ -27,19 +27,19 @@ export function NextWeekCalls({
       {calls.map((call) => (
         <article
           key={call.genre.genre_id}
-          className={`rounded-lg border hairline bg-surface ${
+          className={`border hairline bg-surface ${
             call.skill_status === "no_skill" ? "opacity-60" : ""
           }`}
         >
           <Link
             href={`/genre/${call.genre.slug}`}
-            className="focus-ring group grid gap-6 rounded-lg px-5 py-6 sm:px-7 lg:grid-cols-[58px_minmax(190px,1fr)_minmax(220px,.8fr)_minmax(260px,1fr)_24px] lg:items-center"
+            className="focus-ring group grid gap-6 px-5 py-6 sm:px-7 lg:grid-cols-[58px_minmax(190px,1fr)_minmax(220px,.8fr)_minmax(260px,1fr)_24px] lg:items-center"
           >
             <div>
-              <p className="numeral text-[9px] uppercase tracking-[0.14em] text-white/25">
+              <p className="numeral text-[9px] text-faint">
                 Rank
               </p>
-              <p className="numeral mt-1 text-3xl tracking-[-0.05em] text-white/70">
+              <p className="numeral mt-1 text-3xl tracking-[-0.05em] text-ink">
                 {String(call.rank).padStart(2, "0")}
               </p>
             </div>
@@ -56,18 +56,18 @@ export function NextWeekCalls({
               </div>
               <div className="mt-2 flex items-center gap-2">
                 <CoverageBadge status={call.genre.coverage_status} />
-                <span className="text-[9px] text-white/28">
+                <span className="text-[9px] text-faint">
                   {call.genre.macro_family_name}
                 </span>
               </div>
-              <p className="mt-3 text-xs leading-5 text-white/34">
+              <p className="mt-3 text-xs leading-5 text-faint">
                 {call.skill_status === "skill"
                   ? "The selected models beat persistence inside this genre family."
                   : "No model beat persistence, so the naive call remains visible."}
               </p>
             </div>
             <div className="border-l hairline pl-5">
-              <p className="numeral text-[9px] uppercase tracking-[0.12em] text-white/28">
+              <p className="numeral text-[9px] text-faint">
                 Predicted gain · 80% interval
               </p>
               <div className="mt-2">
@@ -92,7 +92,7 @@ export function NextWeekCalls({
             </div>
             <ArrowRight
               size={15}
-              className="text-white/20 group-hover:text-accent"
+              className="text-faint group-hover:text-accent"
             />
           </Link>
         </article>
@@ -115,16 +115,16 @@ function ModelRecord({
   status: string;
 }) {
   return (
-    <div className="rounded-md border hairline bg-white/[0.018] p-3">
-      <p className="text-[9px] uppercase tracking-[0.1em] text-white/26">
+    <div className="border hairline bg-ink/[0.018] p-3">
+      <p className="text-[9px] text-faint">
         {label}
       </p>
-      <p className="mt-2 text-xs text-white/65">{modelLabel(model)}</p>
-      <p className="numeral mt-2 text-[9px] text-white/30">
+      <p className="mt-2 text-xs text-muted">{modelLabel(model)}</p>
+      <p className="numeral mt-2 text-[9px] text-faint">
         MASE {mase === null ? "—" : formatPlain(mase)} · coverage{" "}
         {formatPlain(coverage, 2)}
       </p>
-      <p className="numeral mt-1 text-[8px] text-white/22">{status}</p>
+      <p className="numeral mt-1 text-[8px] text-faint">{status}</p>
     </div>
   );
 }
@@ -147,7 +147,7 @@ export function ForecastReadiness({
   return (
     <Panel className="mt-6 overflow-hidden">
       <div className="border-b hairline px-5 py-4">
-        <p className="numeral text-[9px] uppercase tracking-[0.14em] text-white/28">
+        <p className="numeral text-[9px] text-faint">
           Forecast readiness
         </p>
         <h2 className="mt-1 text-sm font-medium">
@@ -159,17 +159,17 @@ export function ForecastReadiness({
           <Link
             key={forecast.genre.genre_id}
             href={`/genre/${forecast.genre.slug}`}
-            className="focus-ring border-b border-r hairline px-5 py-4 hover:bg-white/[0.025]"
+            className="focus-ring border-b border-r hairline px-5 py-4 hover:bg-ink/[0.025]"
           >
             <div className="flex items-center justify-between gap-3">
-              <p className="text-xs text-white/65">
+              <p className="text-xs text-muted">
                 {forecast.genre.display_name}
               </p>
-              <span className="numeral text-[9px] text-white/25">
+              <span className="numeral text-[9px] text-faint">
                 {forecast.valid_training_weeks}/8 weeks
               </span>
             </div>
-            <p className="mt-2 text-[10px] leading-4 text-white/30">
+            <p className="mt-2 text-[10px] leading-4 text-faint">
               Insufficient history means no prediction and no skill claim is
               made yet.
             </p>
@@ -188,12 +188,12 @@ export function ForecastIssueSummary({
   count: number;
 }) {
   return (
-    <div className="min-w-48 rounded-md border hairline bg-surface px-4 py-3">
-      <p className="numeral text-[9px] uppercase tracking-[0.12em] text-white/27">
+    <div className="min-w-48 border hairline bg-surface px-4 py-3">
+      <p className="numeral text-[9px] text-faint">
         Issue · {formatWeek(call.target_week)}
       </p>
       <div className="mt-2 flex items-center justify-between gap-4">
-        <span className="text-xs text-white/60">{count} calls</span>
+        <span className="text-xs text-muted">{count} calls</span>
         <ShieldCheck size={13} className="text-accent" />
       </div>
     </div>
@@ -202,8 +202,8 @@ export function ForecastIssueSummary({
 
 export function PredictionIntervalExplainer() {
   return (
-    <div className="rounded-lg border hairline bg-white/[0.018] px-5 py-4 text-xs leading-5 text-white/38">
-      <p className="font-medium text-white/60">
+    <div className="border hairline bg-ink/[0.018] px-5 py-4 text-xs leading-5 text-faint">
+      <p className="font-medium text-muted">
         How to read the 80% prediction interval
       </p>
       <p className="mt-1 max-w-3xl">

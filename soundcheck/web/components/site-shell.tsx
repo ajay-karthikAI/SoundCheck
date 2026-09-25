@@ -1,4 +1,3 @@
-import { CircleDot } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
@@ -28,94 +27,80 @@ export function SiteShell({
   macroFamilies: MacroFamily[];
   familyNavigationUnavailable: boolean;
 }) {
+  const freshness = freshnessUnavailable
+    ? "Data freshness unavailable"
+    : dataThrough
+      ? `${
+          fixtureMode
+            ? "Fixture data through"
+            : provisionalData
+              ? "Provisional data through"
+              : "Data through"
+        } ${formatDataThrough(dataThrough)}`
+      : "Awaiting a complete week";
+
   return (
     <div className="min-h-screen">
-      <header className="border-b hairline">
+      {fixtureMode ? (
+        <div className="bg-ink text-paper">
+          <p className="mx-auto max-w-product px-5 py-2 text-[12px] sm:px-8">
+            <span className="font-medium">Taxonomy v2 fixture preview.</span>{" "}
+            <span className="text-paper/70">
+              Product evaluation only — not observed evidence.
+            </span>
+          </p>
+        </div>
+      ) : null}
+      <header>
         <div className="mx-auto max-w-product px-5 sm:px-8">
-          <div className="flex min-h-16 flex-wrap items-center justify-between gap-4 py-3">
-            <Link
-              href="/"
-              className="focus-ring flex items-center gap-3 rounded-sm"
-              aria-label="Soundcheck home"
-            >
-              <span className="flex size-7 items-center justify-center rounded-md border hairline bg-white/[0.025]">
-                <CircleDot
-                  aria-hidden="true"
-                  className="text-accent"
-                  size={14}
-                  strokeWidth={1.8}
-                />
-              </span>
-              <span className="text-[13px] font-medium tracking-[-0.01em]">
+          <div className="flex flex-wrap items-end justify-between gap-x-10 gap-y-5 border-b-2 border-ink pb-5 pt-8 sm:pt-10">
+            <Link href="/" className="focus-ring" aria-label="Soundcheck home">
+              <span className="block font-serif text-[40px] font-semibold leading-none tracking-[-0.02em] text-ink sm:text-[46px]">
                 Soundcheck
               </span>
-              <span className="hidden border-l hairline pl-3 text-[11px] text-white/35 sm:block">
+              <span className="mt-2 block text-[13px] text-muted">
                 Music ecosystem intelligence
               </span>
             </Link>
-            <div className="flex w-full items-center gap-4 sm:w-auto">
+            <div className="flex w-full flex-col gap-3 sm:w-auto sm:items-end">
+              <p className="numeral text-[12px] text-muted">
+                <span className={freshnessUnavailable ? "text-caution" : undefined}>
+                  {freshness}
+                </span>
+                <span aria-hidden="true" className="px-2 text-rule">
+                  |
+                </span>
+                UTC · ISO weeks
+              </p>
               <GenreSearchForm />
-              <div className="numeral hidden text-[9px] uppercase tracking-[0.14em] text-white/25 lg:block">
-                {taxonomyVersion}
-              </div>
             </div>
           </div>
           <SiteNav />
           {familyNavigationUnavailable ? (
-            <div className="py-3 text-[10px] text-white/28">
+            <p className="py-3 text-[12px] text-faint">
               Genre-family navigation is temporarily unavailable.
-            </div>
+            </p>
           ) : (
             <MacroFamilyNavigation families={macroFamilies} />
           )}
         </div>
       </header>
-      {fixtureMode ? (
-        <div className="border-b border-[#8196d8]/25 bg-[#8196d8]/[0.055]">
-          <div className="numeral mx-auto flex max-w-product items-center justify-between gap-4 px-5 py-2 text-[9px] uppercase tracking-[0.14em] text-[#aebbe7] sm:px-8">
-            <span>Taxonomy v2 fixture preview</span>
-            <span className="text-white/32">
-              Product evaluation only · not observed evidence
-            </span>
-          </div>
-        </div>
-      ) : null}
-      <main className="mx-auto max-w-product px-5 py-12 sm:px-8 sm:py-16">
+      <main className="mx-auto max-w-product px-5 py-10 sm:px-8 sm:py-14">
         {children}
       </main>
-      <footer className="border-t hairline">
-        <div className="mx-auto flex max-w-product flex-col gap-4 px-5 py-8 text-xs text-white/35 sm:flex-row sm:items-center sm:justify-between sm:px-8">
-          <p>Evidence before action. Uncertainty stays visible.</p>
-          <div className="flex items-center gap-5">
-            <span className="numeral inline-flex items-center gap-2">
-              <span
-                className={`size-1.5 rounded-full ${
-                  freshnessUnavailable
-                    ? "bg-[#b98585]"
-                    : dataThrough
-                      ? "bg-accent"
-                      : "bg-white/20"
-                }`}
-              />
-              {freshnessUnavailable
-                ? "Data freshness unavailable"
-                : dataThrough
-                  ? `${
-                      fixtureMode
-                        ? "Fixture data through"
-                        : provisionalData
-                          ? "Provisional data through"
-                          : "Data through"
-                    } ${formatDataThrough(dataThrough)}`
-                  : "Awaiting a complete week"}
-            </span>
+      <footer className="mx-auto max-w-product px-5 sm:px-8">
+        <div className="flex flex-col gap-3 border-t-2 border-ink py-8 text-[13px] text-muted sm:flex-row sm:items-baseline sm:justify-between">
+          <p className="font-serif text-[16px] italic text-ink">
+            Evidence before action. Uncertainty stays visible.
+          </p>
+          <div className="flex flex-wrap items-baseline gap-x-5 gap-y-1">
             <Link
               href="/methods"
-              className="focus-ring rounded-sm hover:text-white/75"
+              className="focus-ring underline decoration-rule underline-offset-4 hover:text-ink hover:decoration-ink"
             >
               How it works
             </Link>
-            <span className="numeral">UTC · ISO weeks</span>
+            <span className="numeral">Taxonomy {taxonomyVersion}</span>
           </div>
         </div>
       </footer>

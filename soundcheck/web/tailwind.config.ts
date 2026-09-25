@@ -1,5 +1,7 @@
 import type { Config } from "tailwindcss";
 
+const token = (name: string) => `rgb(var(--${name}) / <alpha-value>)`;
+
 const config: Config = {
   content: [
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
@@ -8,14 +10,23 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        canvas: "#0A0A0B",
-        surface: "#101012",
-        raised: "#151518",
-        accent: "#6872F3",
+        canvas: token("paper"),
+        paper: token("paper"),
+        surface: token("surface"),
+        raised: token("raised"),
+        ink: token("ink"),
+        muted: token("muted"),
+        faint: token("faint"),
+        rule: token("rule"),
+        accent: token("accent"),
+        cool: token("cool"),
+        caution: token("caution"),
+        confirm: token("confirm"),
       },
       fontFamily: {
-        sans: ["var(--font-geist-sans)", "Inter", "sans-serif"],
-        mono: ["var(--font-geist-mono)", "JetBrains Mono", "monospace"],
+        sans: ["var(--font-sans)", "Public Sans", "Helvetica Neue", "Arial", "sans-serif"],
+        serif: ["var(--font-serif)", "Newsreader", "Georgia", "serif"],
+        mono: ["ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
       },
       maxWidth: {
         product: "1200px",

@@ -31,21 +31,21 @@ export function CreatorMovesFeed({
                   {brief.genre.display_name}
                 </StatusPill>
                 <CoverageBadge status={brief.genre.coverage_status} />
-                <span className="numeral text-[9px] text-white/24">
+                <span className="numeral text-[9px] text-faint">
                   {brief.genre.macro_family_name} · {brief.week}
                 </span>
               </div>
-              <h2 className="mt-5 max-w-2xl text-2xl font-medium tracking-[-0.035em] text-white/90">
+              <h2 className="mt-5 max-w-2xl text-2xl font-medium tracking-[-0.035em] text-ink">
                 {brief.headline}
               </h2>
-              <p className="mt-4 max-w-2xl text-sm leading-6 text-white/45">
+              <p className="mt-4 max-w-2xl text-sm leading-6 text-muted">
                 {brief.rationale}
               </p>
               <ul className="mt-6 grid gap-3">
                 {brief.recommended_actions.map((action) => (
                   <li
                     key={action}
-                    className="flex gap-3 text-xs leading-5 text-white/62"
+                    className="flex gap-3 text-xs leading-5 text-muted"
                   >
                     <Check
                       size={13}
@@ -57,20 +57,20 @@ export function CreatorMovesFeed({
               </ul>
             </div>
             <aside className="border-t hairline pt-6 md:border-l md:border-t-0 md:pl-8 md:pt-0">
-              <p className="text-[9px] uppercase tracking-[0.14em] text-white/28">
+              <p className="text-[9px] text-faint">
                 Opening score · 90% range
               </p>
               <div className="mt-4 flex justify-start">
                 <BandValue band={brief.opportunity} large />
               </div>
               <div className="mt-5 border-t hairline pt-5">
-                <p className="text-[9px] uppercase tracking-[0.12em] text-white/25">
+                <p className="text-[9px] text-faint">
                   Forward direction · 80% interval
                 </p>
                 <div className="mt-3">
                   <BandValue band={brief.forecast_direction} />
                 </div>
-                <p className="numeral mt-3 text-[9px] text-white/30">
+                <p className="numeral mt-3 text-[9px] text-faint">
                   {modelLabel(brief.forecast_model)} · MASE{" "}
                   {brief.backtest_mase === null
                     ? "—"
@@ -84,14 +84,14 @@ export function CreatorMovesFeed({
               </div>
               <Link
                 href={`/genre/${brief.genre.slug}`}
-                className="focus-ring mt-7 inline-flex items-center gap-2 rounded-sm text-xs text-accent hover:text-white"
+                className="focus-ring mt-7 inline-flex items-center gap-2 rounded-sm text-xs text-accent hover:text-ink"
               >
                 Inspect the decision evidence
                 <ArrowUpRight size={12} />
               </Link>
               {brief.evidence_uris.length > 0 ? (
                 <div className="mt-7 border-t hairline pt-5">
-                  <p className="text-[9px] uppercase tracking-[0.12em] text-white/25">
+                  <p className="text-[9px] text-faint">
                     Evidence records
                   </p>
                   <div className="mt-3 flex flex-wrap gap-2">
@@ -101,7 +101,7 @@ export function CreatorMovesFeed({
                         href={sourceRecordUrl(uri)}
                         target="_blank"
                         rel="noreferrer"
-                        className="focus-ring numeral rounded-sm border hairline px-2 py-1 text-[9px] text-white/35 hover:border-white/20 hover:text-white/70"
+                        className="focus-ring numeral rounded-sm border hairline px-2 py-1 text-[9px] text-faint hover:border-ink/40 hover:text-ink"
                       >
                         record {index + 1}
                       </a>

@@ -1,3 +1,4 @@
+import { palette } from "@/lib/palette";
 import type { EstimateBand } from "@/lib/types";
 
 const compact = new Intl.NumberFormat("en", {
@@ -11,19 +12,28 @@ const dateFormat = new Intl.DateTimeFormat("en", {
   timeZone: "UTC",
 });
 
+// Typeset negatives with a true minus sign (U+2212), not a hyphen.
+function typographicMinus(value: string): string {
+  return value.replace("-", "−");
+}
+
 export function formatNumber(value: number, digits = 2): string {
-  return value.toLocaleString("en", {
-    minimumFractionDigits: digits,
-    maximumFractionDigits: digits,
-    signDisplay: value === 0 ? "never" : "exceptZero",
-  });
+  return typographicMinus(
+    value.toLocaleString("en", {
+      minimumFractionDigits: digits,
+      maximumFractionDigits: digits,
+      signDisplay: value === 0 ? "never" : "exceptZero",
+    }),
+  );
 }
 
 export function formatPlain(value: number, digits = 2): string {
-  return value.toLocaleString("en", {
-    minimumFractionDigits: digits,
-    maximumFractionDigits: digits,
-  });
+  return typographicMinus(
+    value.toLocaleString("en", {
+      minimumFractionDigits: digits,
+      maximumFractionDigits: digits,
+    }),
+  );
 }
 
 export function formatCompact(value: number): string {
@@ -38,7 +48,7 @@ export function formatInterval(
   band: EstimateBand,
   digits = 2,
 ): string {
-  return `${formatNumber(band.lower, digits)} — ${formatNumber(
+  return `${formatNumber(band.lower, digits)} to ${formatNumber(
     band.upper,
     digits,
   )}`;
@@ -84,14 +94,14 @@ export function musicbrainzUrl(mbid: string): string {
 }
 
 export function gapColor(value: number): string {
-  if (value > 0.35) return "#8196d8";
-  if (value < -0.35) return "#b98585";
-  return "#7b7b83";
+  if (value > 0.35) return palette.accent;
+  if (value < -0.35) return palette.cool;
+  return palette.neutral;
 }
 
 export function openingColor(value: number | null): string {
-  if (value === null) return "#55555c";
-  if (value > 0.4) return "#8196d8";
-  if (value < -0.4) return "#a47777";
-  return "#73737b";
+  if (value === null) return palette.empty;
+  if (value > 0.4) return palette.accent;
+  if (value < -0.4) return palette.cool;
+  return palette.neutral;
 }

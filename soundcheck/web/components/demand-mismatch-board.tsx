@@ -8,6 +8,7 @@ import {
 import { formatInterval, formatNumber } from "@/lib/format";
 import type { OpportunityItem } from "@/lib/types";
 import { hasOpportunity } from "@/lib/types";
+import { palette } from "@/lib/palette";
 
 export function DemandMismatchBoard({
   opportunities,
@@ -30,14 +31,14 @@ export function DemandMismatchBoard({
       <MismatchPanel
         kicker="Act before the conversation"
         title="Listening is rising quietly"
-        color="#8196d8"
+        color={palette.accent}
         items={listeningLed}
         maximum={maximum}
       />
       <MismatchPanel
         kicker="Validate before investing"
         title="Conversation is ahead of listening"
-        color="#b98585"
+        color={palette.cool}
         items={conversationLed}
         maximum={maximum}
       />
@@ -75,7 +76,7 @@ function MismatchPanel({
         }
       />
       {items.length === 0 ? (
-        <p className="px-6 py-16 text-center text-xs text-white/28">
+        <p className="px-6 py-16 text-center text-xs text-faint">
           No reliable mismatch appears among the selected peers.
         </p>
       ) : (
@@ -83,35 +84,35 @@ function MismatchPanel({
           <Link
             key={item.genre.genre_id}
             href={`/genre/${item.genre.slug}?week=${item.week}`}
-            className="focus-ring group block border-b hairline px-5 py-5 last:border-0 hover:bg-white/[0.025]"
+            className="focus-ring group block border-b hairline px-5 py-5 last:border-0 hover:bg-ink/[0.025]"
           >
             <div className="flex items-start justify-between gap-4">
               <div className="flex min-w-0 gap-3">
-                <span className="numeral text-[10px] text-white/20">
+                <span className="numeral text-[10px] text-faint">
                   {String(index + 1).padStart(2, "0")}
                 </span>
                 <div>
-                  <p className="text-[13px] text-white/70 group-hover:text-white">
+                  <p className="text-[13px] text-ink group-hover:text-ink">
                     {item.genre.display_name}
                   </p>
                   <div className="mt-2 flex items-center gap-2">
                     <CoverageBadge status={item.genre.coverage_status} />
-                    <span className="text-[9px] text-white/25">
+                    <span className="text-[9px] text-faint">
                       {item.genre.macro_family_name}
                     </span>
                   </div>
                 </div>
               </div>
               <div className="text-right">
-                <p className="numeral text-sm text-white/75">
+                <p className="numeral text-sm text-ink">
                   {formatNumber(item.discovery_gap.value)}
                 </p>
-                <p className="numeral mt-1 text-[9px] text-white/28">
+                <p className="numeral mt-1 text-[9px] text-faint">
                   {formatInterval(item.discovery_gap)}
                 </p>
               </div>
             </div>
-            <div className="ml-7 mt-4 h-1 overflow-hidden rounded-full bg-white/[0.05]">
+            <div className="ml-7 mt-4 h-1 overflow-hidden rounded-full bg-ink/[0.05]">
               <div
                 className="h-full rounded-full"
                 style={{

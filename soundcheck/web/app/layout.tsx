@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { GeistMono } from "geist/font/mono";
-import { GeistSans } from "geist/font/sans";
+import { Newsreader, Public_Sans } from "next/font/google";
 import type { ReactNode } from "react";
 
 import { SiteShell } from "@/components/site-shell";
@@ -13,6 +12,24 @@ import {
 import { getObservedFreshness } from "@/lib/provisional-api";
 
 import "./globals.css";
+
+const serif = Newsreader({
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+  axes: ["opsz"],
+  variable: "--font-serif",
+  display: "swap",
+  // Next has no fallback metrics for Newsreader; Georgia is the closest system serif.
+  adjustFontFallback: false,
+  fallback: ["Georgia", "serif"],
+});
+
+// Public Sans is derived from Libre Franklin and ships tabular figures.
+const sans = Public_Sans({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(
@@ -73,7 +90,7 @@ export default async function RootLayout({
   return (
     <html
       lang="en"
-      className={`${GeistSans.variable} ${GeistMono.variable}`}
+      className={`${serif.variable} ${sans.variable}`}
     >
       <body>
         <SiteShell
