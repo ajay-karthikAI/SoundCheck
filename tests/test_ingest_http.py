@@ -7,6 +7,7 @@ from typing import Any
 
 import httpx
 import pytest
+from pydantic import ValidationError
 
 from soundcheck.ingest.http import AsyncRateLimiter, DiskJsonCache, QueryValue
 from soundcheck.ingest.lastfm.client import LastfmClient
@@ -149,3 +150,58 @@ async def test_clients_exponentially_back_off_and_musicbrainz_identifies(
 
     assert len(musicbrainz_requests) == 1
     assert musicbrainz_requests[0].headers["User-Agent"] == MUSICBRAINZ_USER_AGENT
+
+
+@pytest.mark.asyncio
+async def test_clients_retry_empty_success_bodies(tmp_path: Path) -> None:
+    attempts: dict[str, int] = {}
+    delays: list[float] = []
+
+    def flaky_handler(request: httpx.Request) -> httpx.Response:
+        host = request.url.host
+        attempts[host] = attempts.get(host, 0) + 1
+        if attempts[host] == 1:
+            return httpx.Response(200, content=b"")
+        return httpx.Response(200, json={"ok": True})
+
+    async def record_sleep(delay: float) -> None:
+        delays.append(delay)
+
+    async with httpx.AsyncClient(
+        transport=httpx.MockTransport(flaky_handler)
+    ) as http_client:
+        lastfm = LastfmClient(
+            http_client,
+            "test-key",
+            limiter=NoopLimiter(),
+            cache=DiskJsonCache(tmp_path / "lfm", max_age_seconds=None),
+            sleeper=record_sleep,
+        )
+        musicbrainz = MusicBrainzClient(
+            http_client,
+            limiter=NoopLimiter(),
+            cache=DiskJsonCache(tmp_path / "mb", max_age_seconds=None),
+            sleeper=record_sleep,
+        )
+        assert await lastfm.get("artist.getInfo", {"artist": "x"}) == {"ok": True}
+        assert await musicbrainz.get("artist", {"query": "x"}) == {"ok": True}
+
+    assert attempts == {"ws.audioscrobbler.com": 2, "musicbrainz.org": 2}
+    assert delays == [1.0, 1.0]
+
+    def empty_handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, content=b"")
+
+    async with httpx.AsyncClient(
+        transport=httpx.MockTransport(empty_handler)
+    ) as http_client:
+        lastfm = LastfmClient(
+            http_client,
+            "test-key",
+            limiter=NoopLimiter(),
+            cache=DiskJsonCache(tmp_path / "lfm-empty", max_age_seconds=None),
+            sleeper=record_sleep,
+            max_attempts=2,
+        )
+        with pytest.raises(ValidationError):
+            await lastfm.get("artist.getInfo", {"artist": "x"})

@@ -8,7 +8,7 @@ from collections.abc import Mapping
 from pathlib import Path
 
 import httpx
-from pydantic import JsonValue, TypeAdapter
+from pydantic import JsonValue, TypeAdapter, ValidationError
 
 from soundcheck.ingest.http import (
     AsyncRateLimiter,
@@ -110,7 +110,13 @@ class LastfmClient:
                     if api_error.code in _RETRYABLE_API_ERRORS:
                         raise _RetryableLastfmError(api_error)
                     raise api_error
-            except (httpx.TransportError, httpx.HTTPStatusError, _RetryableLastfmError):
+            except (
+                httpx.TransportError,
+                httpx.HTTPStatusError,
+                _RetryableLastfmError,
+                # Last.fm intermittently answers 200 with an empty body.
+                ValidationError,
+            ):
                 if attempt == self._max_attempts:
                     raise
                 await self._sleeper(delay)

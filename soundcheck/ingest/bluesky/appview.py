@@ -11,7 +11,7 @@ from typing import Literal
 
 import duckdb
 import httpx
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, ValidationError
 
 from soundcheck.ingest.bluesky.models import (
     AppViewGetPostsResponse,
@@ -59,7 +59,7 @@ class AppViewClient:
                 response = await self._client.get(APPVIEW_GET_POSTS_URL, params=params)
                 response.raise_for_status()
                 return AppViewGetPostsResponse.model_validate_json(response.content)
-            except (httpx.HTTPStatusError, httpx.TransportError):
+            except (httpx.HTTPStatusError, httpx.TransportError, ValidationError):
                 if attempt == self._max_attempts:
                     raise
                 await asyncio.sleep(delay)

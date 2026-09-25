@@ -36,6 +36,25 @@ def test_appview_fixture_validation(appview_payload: dict[str, Any]) -> None:
 
 
 @pytest.mark.asyncio
+async def test_appview_retries_empty_success_body() -> None:
+    uri = "at://did:plc:test/app.bsky.feed.post/1"
+    attempts = 0
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        nonlocal attempts
+        attempts += 1
+        if attempts == 1:
+            return httpx.Response(200, content=b"")
+        return httpx.Response(200, json={"posts": [{"uri": uri, "likeCount": 1}]})
+
+    async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as http_client:
+        response = await AppViewClient(http_client).fetch_posts((uri,))
+
+    assert attempts == 2
+    assert response.posts[0].like_count == 1
+
+
+@pytest.mark.asyncio
 async def test_appview_batches_25_and_appends_repolls(tmp_path: Path) -> None:
     requested_batch_sizes: list[int] = []
 

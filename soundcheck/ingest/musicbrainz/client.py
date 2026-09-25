@@ -8,7 +8,7 @@ from collections.abc import Mapping
 from pathlib import Path
 
 import httpx
-from pydantic import JsonValue, TypeAdapter
+from pydantic import JsonValue, TypeAdapter, ValidationError
 
 from soundcheck.ingest.http import (
     AsyncRateLimiter,
@@ -91,7 +91,12 @@ class MusicBrainzClient:
                     response.raise_for_status()
                 response.raise_for_status()
                 payload = _JSON_OBJECT.validate_json(response.content)
-            except (httpx.TransportError, httpx.HTTPStatusError):
+            except (
+                httpx.TransportError,
+                httpx.HTTPStatusError,
+                # An empty or truncated 200 body is as transient as a timeout.
+                ValidationError,
+            ):
                 if attempt == self._max_attempts:
                     raise
                 await self._sleeper(delay)
